@@ -275,13 +275,42 @@
                                 }
                             ]
                         }
+                    },
+                    {
+                        "name": "CoreServices",
+                        "properties": {
+                            "priority": 1003,
+                            "action": {
+                                "type": "Allow"
+                            },
+                            "rules": [
+                                {
+                                    "name": "DNStoAD",
+                                    "protocols": [
+                                        "UDP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "destinationAddresses": [
+                                        "10.3.250.10"
+                                    ],
+                                    "sourceIpGroups": [],
+                                    "destinationIpGroups": [],
+                                    "destinationFqdns": [],
+                                    "destinationPorts": [
+                                        "53"
+                                    ]
+                                }
+                            ]
+                        }
                     }
                 ],
                 "applicationRuleCollections": [
                     {
                         "name": "UpdatesWindows",
                         "properties": {
-                            "priority": 100,
+                            "priority": 1000,
                             "action": {
                                 "type": "Allow"
                             },
@@ -352,6 +381,40 @@
                                     "sourceAddresses": [
                                         "*"
                                     ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "CoreServices",
+                        "properties": {
+                            "priority": 1020,
+                            "action": {
+                                "type": "Allow"
+                            },
+                            "rules": [
+                                {
+                                    "name": "Core",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Http",
+                                            "port": 80
+                                        },
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [
+                                        "WindowsDiagnostics",
+                                        "AzureBackup",
+                                        "MicrosoftActiveProtectionService"
+                                    ],
+                                    "targetFqdns": [],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
                                 }
                             ]
                         }
