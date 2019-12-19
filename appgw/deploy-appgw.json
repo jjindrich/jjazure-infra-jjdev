@@ -5,17 +5,34 @@
         "applicationGatewayName": {
             "defaultValue": "jjappgw",
             "type": "String"
+        },        
+        "availabilityZones": {
+            "type": "array",
+            "defaultValue": [
+                "1",
+                "2",
+                "3"
+            ],
+            "metadata": {
+                "description": "Zone numbers e.g. 1,2,3."
+            }
         },
         "virtualNetworkName": {
             "type": "string"
         },
         "subnetName": {
             "type": "string"
+        },
+        "publicIpAddress": {
+            "type": "string"
+        },
+        "publicIpPrefix": {
+            "type": "string"
         }
     },
     "variables": {
         "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-        "publicIpName": "[concat(parameters('applicationGatewayName'),'-ip')]"
+        "publicIpPrefixId": "[resourceId('Microsoft.Network/publicIPPrefixes', parameters('publicIpPrefix'))]"
     },
     "resources": [
         {
@@ -73,20 +90,24 @@
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-09-01",
-            "name": "[variables('publicIpName')]",
+            "name": "[parameters('publicIpAddress')]",
             "location": "[resourceGroup().location]",
             "sku": {
-                "name": "Standard"
+                "name": "Standard",
+                "tier": "Regional"
             },
             "properties": {
                 "publicIPAddressVersion": "IPv4",
                 "publicIPAllocationMethod": "Static",
                 "idleTimeoutInMinutes": 4,
                 "dnsSettings": {
-                    "domainNameLabel": "jjdevv2appgw"
+                    "domainNameLabel": "[parameters('applicationGatewayName')]"
                 },
                 "ipTags": [
-                ]
+                ],
+                "publicIPPrefix": {
+                    "id": "[variables('publicIpPrefixId')]"
+                }
             }
         },
         {
@@ -94,8 +115,9 @@
             "apiVersion": "2019-09-01",
             "name": "[parameters('applicationGatewayName')]",
             "location": "[resourceGroup().location]",
+            "zones": "[if(equals(length(parameters('availabilityZones')), 0), json('null'), parameters('availabilityZones'))]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]"
+                "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpAddress'))]"
             ],
             "properties": {
                 "sku": {
@@ -107,7 +129,7 @@
                         "name": "appGatewayIpConfig",
                         "properties": {
                             "subnet": {
-                                "id": "[concat(variables('vnetId'), '/subnets/AzureApplicationGatewaySubnet')]"
+                                "id": "[concat(variables('vnetId'), '/subnets/',parameters('subnetName'))]"
                             }
                         }
                     }
@@ -122,7 +144,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpAddress'))]"
                             }
                         }
                     }

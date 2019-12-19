@@ -5,6 +5,17 @@
         "azureFirewallName": {
             "type": "string"
         },
+        "availabilityZones": {
+            "type": "array",
+            "defaultValue": [
+                "1",
+                "2",
+                "3"
+            ],
+            "metadata": {
+                "description": "Zone numbers e.g. 1,2,3."
+            }
+        },
         "virtualNetworkName": {
             "type": "string"
         },
@@ -12,6 +23,9 @@
             "type": "string"
         },
         "publicIpAddress": {
+            "type": "string"
+        },
+        "publicIpPrefix": {
             "type": "string"
         },
         "routeTablesName": {
@@ -25,45 +39,39 @@
         }
     },
     "variables": {
-        "networkApiVersion": "?api-version=2019-04-01",
-        "publicIp": "51.105.234.60",
         "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-        "publicIpId": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpAddress'))]"
+        "publicIpId": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpAddress'))]",
+        "publicIpPrefixId": "[resourceId('Microsoft.Network/publicIPPrefixes', parameters('publicIpPrefix'))]"
     },
     "resources": [
         {
             "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2019-09-01",
             "name": "[parameters('publicIpAddress')]",
-            "location": "westeurope",
-            "tags": {
-                "Account": "Shared"
-            },
+            "location": "[resourceGroup().location]",
             "sku": {
                 "name": "Standard",
                 "tier": "Regional"
             },
             "properties": {
-                "ipAddress": "[variables('publicIp')]",
                 "publicIPAddressVersion": "IPv4",
                 "publicIPAllocationMethod": "Static",
                 "idleTimeoutInMinutes": 4,
                 "dnsSettings": {
-                    "domainNameLabel": "jjdevv2fw",
-                    "fqdn": "jjdevv2fw.westeurope.cloudapp.azure.com"
+                    "domainNameLabel": "[parameters('azureFirewallName')]"
                 },
                 "ipTags": [
-                ]
+                ],
+                "publicIPPrefix": {
+                    "id": "[variables('publicIpPrefixId')]"
+                }
             }
         },
         {
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "2019-07-01",
             "name": "[parameters('routeTablesName')]",
-            "location": "westeurope",
-            "tags": {
-                "Account": "Shared"
-            },
+            "location": "[resourceGroup().location]",
             "properties": {
                 "disableBgpRoutePropagation": false,
                 "routes": [
@@ -72,7 +80,7 @@
                         "properties": {
                             "addressPrefix": "0.0.0.0/0",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.3.252.4"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     },
                     {
@@ -80,7 +88,7 @@
                         "properties": {
                             "addressPrefix": "10.1.0.0/16",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.3.252.4"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     },
                     {
@@ -88,7 +96,7 @@
                         "properties": {
                             "addressPrefix": "10.4.0.0/16",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.3.252.4"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     },
                     {
@@ -96,7 +104,7 @@
                         "properties": {
                             "addressPrefix": "10.3.0.0/16",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.3.252.4"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     }
                 ]
@@ -106,10 +114,7 @@
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "2019-07-01",
             "name": "[parameters('routeTablesNameVpn')]",
-            "location": "westeurope",
-            "tags": {
-                "Account": "Shared"
-            },
+            "location": "[resourceGroup().location]",
             "properties": {
                 "disableBgpRoutePropagation": false,
                 "routes": [
@@ -118,7 +123,7 @@
                         "properties": {
                             "addressPrefix": "10.3.0.0/16",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.3.252.4"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     },
                     {
@@ -126,7 +131,7 @@
                         "properties": {
                             "addressPrefix": "10.4.0.0/16",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.3.252.4"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     }
 
@@ -137,10 +142,7 @@
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "2019-07-01",
             "name": "[parameters('routeTablesNameAppGw')]",
-            "location": "westeurope",
-            "tags": {
-                "Account": "Shared"
-            },
+            "location": "[resourceGroup().location]",
             "properties": {
                 "disableBgpRoutePropagation": false,
                 "routes": [
@@ -149,7 +151,7 @@
                         "properties": {
                             "addressPrefix": "10.1.0.0/16",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.3.252.4"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     },
                     {
@@ -157,7 +159,7 @@
                         "properties": {
                             "addressPrefix": "10.4.0.0/16",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.3.252.4"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     },
                     {
@@ -165,7 +167,7 @@
                         "properties": {
                             "addressPrefix": "10.3.0.0/16",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.3.252.4"
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
                     }
                 ]
@@ -176,6 +178,7 @@
             "type": "Microsoft.Network/azureFirewalls",
             "name": "[parameters('azureFirewallName')]",
             "location": "[resourceGroup().location]",
+            "zones": "[if(equals(length(parameters('availabilityZones')), 0), json('null'), parameters('availabilityZones'))]",
             "dependsOn": [
             ],
             "properties": {
@@ -295,9 +298,12 @@
                                     "destinationAddresses": [
                                         "10.3.250.10"
                                     ],
-                                    "sourceIpGroups": [],
-                                    "destinationIpGroups": [],
-                                    "destinationFqdns": [],
+                                    "sourceIpGroups": [
+                                    ],
+                                    "destinationIpGroups": [
+                                    ],
+                                    "destinationFqdns": [
+                                    ],
                                     "destinationPorts": [
                                         "53"
                                     ]
@@ -410,11 +416,13 @@
                                         "AzureBackup",
                                         "MicrosoftActiveProtectionService"
                                     ],
-                                    "targetFqdns": [],
+                                    "targetFqdns": [
+                                    ],
                                     "sourceAddresses": [
                                         "*"
                                     ],
-                                    "sourceIpGroups": []
+                                    "sourceIpGroups": [
+                                    ]
                                 }
                             ]
                         }
@@ -437,10 +445,10 @@
                                     "translatedAddress": "10.3.250.10",
                                     "translatedPort": "3389",
                                     "sourceAddresses": [
-                                        "[variables('publicIp')]"
+                                        "[reference(parameters('publicIpAddress')).ipAddress]"
                                     ],
                                     "destinationAddresses": [
-                                        "[variables('publicIp')]"
+                                        "[reference(parameters('publicIpAddress')).ipAddress]"
                                     ],
                                     "destinationPorts": [
                                         "3389"

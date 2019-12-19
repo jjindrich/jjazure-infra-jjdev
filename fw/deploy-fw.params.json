@@ -14,6 +14,9 @@
         "publicIpAddress": {
             "value": "jjdevv2fw-ip"
         },
+        "publicIpPrefix": {
+            "value": "jjdevv2network-pip"
+        },        
         "routeTablesName": {
             "value": "jjdevv2fw-rt"
         },

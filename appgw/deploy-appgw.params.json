@@ -10,6 +10,12 @@
         },
         "subnetName": {
             "value": "AzureApplicationGatewaySubnet"
+        },
+        "publicIpAddress": {
+            "value": "jjdevv2appgw-ip"
+        },
+        "publicIpPrefix": {
+            "value": "jjdevv2network-pip"
         }
     }
 }
