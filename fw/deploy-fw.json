@@ -310,6 +310,35 @@
                                 }
                             ]
                         }
+                    },
+                    {
+                        "name": "WindowsKMS",
+                        "properties": {
+                            "priority": 1004,
+                            "action": {
+                                "type": "Allow"
+                            },
+                            "rules": [
+                                {
+                                    "name": "AzureGlobalKMS",
+                                    "protocols": [
+                                        "TCP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "destinationAddresses": [
+                                        "23.102.135.246"
+                                    ],
+                                    "sourceIpGroups": [],
+                                    "destinationIpGroups": [],
+                                    "destinationFqdns": [],
+                                    "destinationPorts": [
+                                        "1688"
+                                    ]
+                                }
+                            ]
+                        }
                     }
                 ],
                 "applicationRuleCollections": [
