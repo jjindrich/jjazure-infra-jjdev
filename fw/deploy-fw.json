@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "azureFirewallName": {
@@ -307,6 +307,27 @@
                                     "destinationPorts": [
                                         "53"
                                     ]
+                                },
+                                {
+                                    "name": "NTPLinux",
+                                    "protocols": [
+                                        "UDP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "destinationAddresses": [
+                                        "91.189.89.198"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ],
+                                    "destinationIpGroups": [
+                                    ],
+                                    "destinationFqdns": [
+                                    ],
+                                    "destinationPorts": [
+                                        "123"
+                                    ]
                                 }
                             ]
                         }
@@ -330,9 +351,12 @@
                                     "destinationAddresses": [
                                         "23.102.135.246"
                                     ],
-                                    "sourceIpGroups": [],
-                                    "destinationIpGroups": [],
-                                    "destinationFqdns": [],
+                                    "sourceIpGroups": [
+                                    ],
+                                    "destinationIpGroups": [
+                                    ],
+                                    "destinationFqdns": [
+                                    ],
                                     "destinationPorts": [
                                         "1688"
                                     ]
@@ -452,6 +476,187 @@
                                     ],
                                     "sourceIpGroups": [
                                     ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "AKS",
+                        "properties": {
+                            "priority": 1030,
+                            "action": {
+                                "type": "Allow"
+                            },
+                            "rules": [
+                                {
+                                    "name": "api",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "*.hcp.westeurope.azmk8s.io"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "repo",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "aksrepos.azurecr.io"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "packages",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "packages.microsoft.com"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "api endpoint",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "*.tun.westeurope.azmk8s.io"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "storage",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "*.blob.core.windows.net"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "mcr",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "mcr.microsoft.com"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "cdn",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "*.cdn.mscr.io"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "management",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "management.azure.com"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "login",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "login.microsoftonline.com"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "acs-mirror.azureedge.net",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "acs-mirror.azureedge.net"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
                                 }
                             ]
                         }

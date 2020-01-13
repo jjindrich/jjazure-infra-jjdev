@@ -28,6 +28,15 @@ cd fw
 ./deploy.sh
 ```
 
+Check firewall Deny logs
+
+```kusto
+search *   
+| where Resource == "JJDEVV2FW" and msg_s contains "Deny"
+| top 500 by TimeGenerated// return the latest 500 results
+| project msg_s 
+```
+
 ## Deploy Azure Application Gateway
 
 It will deploy Azure Application Gateway. It requires enabled allowed UDRs on Application Gateway subnet. 
