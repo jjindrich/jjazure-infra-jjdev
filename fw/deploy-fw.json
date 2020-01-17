@@ -328,6 +328,24 @@
                                     "destinationPorts": [
                                         "123"
                                     ]
+                                },
+                                {
+                                    "name": "AAD",
+                                    "protocols": [
+                                        "TCP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "destinationAddresses": [
+                                        "AzureActiveDirectory"
+                                    ],
+                                    "sourceIpGroups": [],
+                                    "destinationIpGroups": [],
+                                    "destinationFqdns": [],
+                                    "destinationPorts": [
+                                        "443"
+                                    ]
                                 }
                             ]
                         }
