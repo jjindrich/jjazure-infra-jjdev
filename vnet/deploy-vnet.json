@@ -243,13 +243,34 @@
                 ]
             }
         },
-                {
+        {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-11-01",
             "name": "[concat(parameters('vnetAppName'),'-AKS')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "securityRules": [
+                    {
+                        "name": "HTTP",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "VirtualNetwork",
+                            "access": "Allow",
+                            "priority": 300,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [
+                            ],
+                            "destinationPortRanges": [
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": [
+                            ]
+                        }
+                    }
                 ]
             }
         },
@@ -300,7 +321,7 @@
                         "properties": {
                             "addressPrefix": "10.4.2.0/24",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetAppName'),'-Default'))]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetAppName'),'-AKS'))]"
                             },
                             "serviceEndpoints": [
                             ],
