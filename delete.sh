@@ -5,3 +5,8 @@ cd ..
 
 cd appgw
 ./delete.sh
+
+cd ..
+
+cd vnet
+./delete.sh
