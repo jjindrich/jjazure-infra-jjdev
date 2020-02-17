@@ -275,6 +275,21 @@
                                     "destinationPorts": [
                                         "80"
                                     ]
+                                },
+                                {
+                                    "name": "HTTPAppGwtoADDC",
+                                    "protocols": [
+                                        "TCP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "10.3.253.0/24"
+                                    ],
+                                    "destinationAddresses": [
+                                        "10.3.250.0/24"
+                                    ],
+                                    "destinationPorts": [
+                                        "80"
+                                    ]
                                 }
                             ]
                         }

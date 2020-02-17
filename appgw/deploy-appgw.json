@@ -5,7 +5,7 @@
         "applicationGatewayName": {
             "defaultValue": "jjappgw",
             "type": "String"
-        },        
+        },
         "availabilityZones": {
             "type": "array",
             "defaultValue": [
@@ -164,6 +164,16 @@
                             "backendAddresses": [
                                 {
                                     "ipAddress": "10.1.0.10"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "jjdevv2addc",
+                        "properties": {
+                            "backendAddresses": [
+                                {
+                                    "ipAddress": "10.3.250.10"
                                 }
                             ]
                         }
