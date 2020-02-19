@@ -187,27 +187,6 @@
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
-                    },
-                    {
-                        "name": "DmzFunctionLinux",
-                        "properties": {
-                            "addressPrefix": "10.3.3.0/24",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetHubName'),'-Default'))]"
-                            },
-                            "serviceEndpoints": [
-                            ],
-                            "delegations": [
-                                {
-                                    "name": "delegation",
-                                    "properties": {
-                                        "serviceName": "Microsoft.Web/serverfarms"
-                                    }
-                                }
-                            ],
-                            "privateEndpointNetworkPolicies": "Enabled",
-                            "privateLinkServiceNetworkPolicies": "Enabled"
-                        }
                     }
                 ],
                 "virtualNetworkPeerings": [
@@ -297,16 +276,6 @@
             }
         },
         {
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2019-11-01",
-            "name": "[concat(parameters('vnetAppName'),'-Functions')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "securityRules": [
-                ]
-            }
-        },
-        {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2019-11-01",
             "name": "[parameters('vnetAppName')]",
@@ -354,32 +323,11 @@
                         }
                     },
                     {
-                        "name": "DmzFunctionLinux",
+                        "name": "DmzFunction",
                         "properties": {
                             "addressPrefix": "10.4.21.0/24",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetAppName'),'-Functions'))]"
-                            },
-                            "serviceEndpoints": [
-                            ],
-                            "delegations": [
-                                {
-                                    "name": "delegation",
-                                    "properties": {
-                                        "serviceName": "Microsoft.Web/serverfarms"
-                                    }
-                                }
-                            ],
-                            "privateEndpointNetworkPolicies": "Enabled",
-                            "privateLinkServiceNetworkPolicies": "Enabled"
-                        }
-                    },
-                    {
-                        "name": "DmzFunction",
-                        "properties": {
-                            "addressPrefix": "10.4.22.0/24",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetAppName'),'-Functions'))]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetAppName'),'-Default'))]"
                             },
                             "serviceEndpoints": [
                             ],
