@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vnetHubName": {
@@ -188,26 +188,7 @@
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
                     }
-                ],
-                "virtualNetworkPeerings": [
-                    {
-                        "name": "[parameters('vnetAppName')]",
-                        "properties": {
-                            "remoteVirtualNetwork": {
-                                "id": "[variables('vnetAppId')]"
-                            },
-                            "allowVirtualNetworkAccess": true,
-                            "allowForwardedTraffic": true,
-                            "allowGatewayTransit": true,
-                            "useRemoteGateways": false,
-                            "remoteAddressSpace": {
-                                "addressPrefixes": [
-                                    "10.4.0.0/16"
-                                ]
-                            }
-                        }
-                    }
-                ],
+                ],                
                 "enableDdosProtection": false,
                 "enableVmProtection": false
             }
@@ -250,7 +231,7 @@
                             ]
                         }
                     },
-                                        {
+                    {
                         "name": "HTTPS",
                         "properties": {
                             "protocol": "TCP",
@@ -343,28 +324,57 @@
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
                     }
-                ],
-                "virtualNetworkPeerings": [
-                    {
-                        "name": "[parameters('vnetHubName')]",
-                        "properties": {
-                            "remoteVirtualNetwork": {
-                                "id": "[variables('vnetHubId')]"
-                            },
-                            "allowVirtualNetworkAccess": true,
-                            "allowForwardedTraffic": true,
-                            "allowGatewayTransit": false,
-                            "useRemoteGateways": true,
-                            "remoteAddressSpace": {
-                                "addressPrefixes": [
-                                    "10.3.0.0/16"
-                                ]
-                            }
-                        }
-                    }
-                ],
+                ],                
                 "enableDdosProtection": false,
                 "enableVmProtection": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "apiVersion": "2019-11-01",
+            "name": "[concat(parameters('vnetHubName'),'/','to-',parameters('vnetAppName'))]",
+            "dependsOn": [
+                "[variables('vnetHubId')]",
+                "[variables('vnetAppId')]"
+
+            ],
+            "properties": {
+                "remoteVirtualNetwork": {
+                    "id": "[variables('vnetAppId')]"
+                },
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": false,
+                "allowGatewayTransit": true,
+                "useRemoteGateways": false,
+                "remoteAddressSpace": {
+                    "addressPrefixes": [
+                        "10.4.0.0/16"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "apiVersion": "2019-11-01",
+            "name": "[concat(parameters('vnetAppName'),'/','to-',parameters('vnetHubName'))]",
+            "dependsOn": [
+                "[variables('vnetHubId')]",
+                "[variables('vnetAppId')]"
+
+            ],
+            "properties": {
+                "remoteVirtualNetwork": {
+                    "id": "[variables('vnetHubId')]"
+                },
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": false,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": true,
+                "remoteAddressSpace": {
+                    "addressPrefixes": [
+                        "10.3.0.0/16"
+                    ]
+                }
             }
         }
     ]
