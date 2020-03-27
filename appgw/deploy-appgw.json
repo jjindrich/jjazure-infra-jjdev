@@ -36,58 +36,6 @@
     },
     "resources": [
         {
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2019-09-01",
-            "name": "JJDevV2Network-AzureApplicationGatewaySubnet",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "securityRules": [
-                    {
-                        "name": "AppGw-ManagementV2",
-                        "properties": {
-                            "protocol": "*",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "65200-65535",
-                            "sourceAddressPrefix": "GatewayManager",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 1000,
-                            "direction": "Inbound",
-                            "sourcePortRanges": [
-                            ],
-                            "destinationPortRanges": [
-                            ],
-                            "sourceAddressPrefixes": [
-                            ],
-                            "destinationAddressPrefixes": [
-                            ]
-                        }
-                    },
-                    {
-                        "name": "HTTP",
-                        "properties": {
-                            "protocol": "*",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "80",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 100,
-                            "direction": "Inbound",
-                            "sourcePortRanges": [
-                            ],
-                            "destinationPortRanges": [
-                            ],
-                            "sourceAddressPrefixes": [
-                            ],
-                            "destinationAddressPrefixes": [
-                            ]
-                        }
-                    }
-                ]
-            }
-        },
-        {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-09-01",
             "name": "[parameters('publicIpAddress')]",
@@ -147,6 +95,16 @@
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpAddress'))]"
                             }
                         }
+                    },
+                    {
+                        "name": "appGwPrivateFrontendIp",
+                        "properties": {
+                            "privateIPAddress": "10.3.253.10",
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[concat(variables('vnetId'), '/subnets/',parameters('subnetName'))]"
+                            }
+                        }
                     }
                 ],
                 "frontendPorts": [
@@ -154,6 +112,12 @@
                         "name": "port_80",
                         "properties": {
                             "port": 80
+                        }
+                    },
+                    {
+                        "name": "port_8080",
+                        "properties": {
+                            "port": 8080
                         }
                     }
                 ],
@@ -199,6 +163,21 @@
                                 "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendIPConfigurations/appGwPublicFrontendIp')]"
                             },
                             "frontendPort": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendPorts/port_8080')]"
+                            },
+                            "protocol": "Http",
+                            "hostNames": [
+                            ],
+                            "requireServerNameIndication": false
+                        }
+                    },
+                    {
+                        "name": "listen-private",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendIPConfigurations/appGwPrivateFrontendIp')]"
+                            },
+                            "frontendPort": {
                                 "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendPorts/port_80')]"
                             },
                             "protocol": "Http",
@@ -212,11 +191,26 @@
                 ],
                 "requestRoutingRules": [
                     {
-                        "name": "all",
+                        "name": "public-routeall",
                         "properties": {
                             "ruleType": "Basic",
                             "httpListener": {
                                 "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/httpListeners/listen-public')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/backendAddressPools/jjdevs1server')]"
+                            },
+                            "backendHttpSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/backendHttpSettingsCollection/http-setting')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "private-routeall",
+                        "properties": {
+                            "ruleType": "Basic",
+                            "httpListener": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/httpListeners/listen-private')]"
                             },
                             "backendAddressPool": {
                                 "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/backendAddressPools/jjdevs1server')]"

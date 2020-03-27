@@ -77,15 +77,16 @@
                         "properties": {
                             "protocol": "TCP",
                             "sourcePortRange": "*",
-                            "destinationPortRange": "80",
+                            "destinationPortRanges": [
+                                "80",
+                                "8080"
+                            ],
                             "sourceAddressPrefix": "*",
                             "destinationAddressPrefix": "VirtualNetwork",
                             "access": "Allow",
                             "priority": 300,
                             "direction": "Inbound",
                             "sourcePortRanges": [
-                            ],
-                            "destinationPortRanges": [
                             ],
                             "sourceAddressPrefixes": [
                             ],
@@ -188,7 +189,7 @@
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
                     }
-                ],                
+                ],
                 "enableDdosProtection": false,
                 "enableVmProtection": false
             }
@@ -324,7 +325,7 @@
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
                     }
-                ],                
+                ],
                 "enableDdosProtection": false,
                 "enableVmProtection": false
             }
