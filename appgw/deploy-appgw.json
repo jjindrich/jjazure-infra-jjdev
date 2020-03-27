@@ -224,13 +224,84 @@
                 "probes": [
                 ],
                 "rewriteRuleSets": [
+                    {
+                        "name": "RemoveSever",
+                        "properties": {
+                            "rewriteRules": [
+                                {
+                                    "ruleSequence": 100,
+                                    "conditions": [
+                                    ],
+                                    "name": "NewRewrite",
+                                    "actionSet": {
+                                        "requestHeaderConfigurations": [
+                                        ],
+                                        "responseHeaderConfigurations": [
+                                            {
+                                                "headerName": "Server"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
                 ],
-                "redirectConfigurations": [
-                ],
+                "redirectConfigurations": [],
                 "enableHttp2": false,
                 "autoscaleConfiguration": {
                     "minCapacity": 0,
                     "maxCapacity": 2
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
+            "apiVersion": "2019-11-01",
+            "name": "[concat(parameters('applicationGatewayName'),'-policy')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "customRules": [
+                    {
+                        "name": "denyQueryString",
+                        "priority": 1,
+                        "ruleType": "MatchRule",
+                        "action": "Block",
+                        "matchConditions": [
+                            {
+                                "matchVariables": [
+                                    {
+                                        "variableName": "QueryString"
+                                    }
+                                ],
+                                "operator": "Contains",
+                                "negationConditon": false,
+                                "matchValues": [
+                                    "deny"
+                                ],
+                                "transforms": [
+                                    "Lowercase"
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "policySettings": {
+                    "requestBodyCheck": true,
+                    "maxRequestBodySizeInKb": 128,
+                    "fileUploadLimitInMb": 100,
+                    "state": "Enabled",
+                    "mode": "Prevention"
+                },
+                "managedRules": {
+                    "managedRuleSets": [
+                        {
+                            "ruleSetType": "OWASP",
+                            "ruleSetVersion": "3.0",
+                            "ruleGroupOverrides": []
+                        }
+                    ],
+                    "exclusions": []
                 }
             }
         }
