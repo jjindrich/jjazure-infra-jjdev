@@ -360,6 +360,29 @@
                                     ]
                                 },
                                 {
+                                    "name": "LDAPtoAD, Kerberos",
+                                    "protocols": [
+                                        "TCP",
+                                        "UDP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "destinationAddresses": [
+                                        "10.3.250.10"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ],
+                                    "destinationIpGroups": [
+                                    ],
+                                    "destinationFqdns": [
+                                    ],
+                                    "destinationPorts": [
+                                        "389",
+                                        "88"
+                                    ]
+                                },
+                                {
                                     "name": "AAD",
                                     "protocols": [
                                         "TCP"
@@ -503,6 +526,102 @@
                                 "type": "Allow"
                             },
                             "rules": [
+                                {
+                                    "name": "Monitoring",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [
+                                    ],
+                                    "targetFqdns": [
+                                        "*.ods.opinsights.azure.com",
+                                        "*.oms.opinsights.azure.com"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ]
+                                },
+                                {
+                                    "name": "ADsync",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [
+                                    ],
+                                    "targetFqdns": [
+                                        "*.servicebus.windows.net"
+                                    ],
+                                    "sourceAddresses": [
+                                        "10.3.250.10"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ]
+                                },
+                                {
+                                    "name": "Automation",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [
+                                    ],
+                                    "targetFqdns": [
+                                        "*.azure-automation.net"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ]
+                                },
+                                {
+                                    "name": "SiteRecovery",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [
+                                    ],
+                                    "targetFqdns": [
+                                        "*.servicebus.windows.net"
+                                    ],
+                                    "sourceAddresses": [
+                                        "10.4.1.4"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ]
+                                },
+                                {
+                                    "name": "ATP",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [
+                                    ],
+                                    "targetFqdns": [
+                                        "winatp-gw-neu.microsoft.com"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ]
+                                },
                                 {
                                     "name": "Core",
                                     "protocols": [
