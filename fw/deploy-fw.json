@@ -646,6 +646,25 @@
                                     ],
                                     "sourceIpGroups": [
                                     ]
+                                },
+                                {
+                                    "name": "MonitorQualys",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [
+                                    ],
+                                    "targetFqdns": [
+                                        "*.apps.qualys.eu"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ]
                                 }
                             ]
                         }
@@ -850,6 +869,36 @@
                                 }
                             ]
                         }
+                    },
+                    {
+                        "name": "AppService",
+                        "properties": {
+                            "priority": 1040,
+                            "action": {
+                                "type": "Allow"
+                            },
+                            "rules": [
+                                {
+                                    "name": "AppService",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [
+                                    ],
+                                    "targetFqdns": [
+                                        "azurewatsonanalysis-prod.core.windows.net"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ]
+                                }
+                            ]
+                        }
                     }
                 ],
                 "natRuleCollections": [
@@ -894,7 +943,7 @@
                                     "protocols": [
                                         "TCP"
                                     ],
-                                    "translatedAddress": "10.3.253.10",
+                                    "translatedAddress": "10.3.250.10",
                                     "translatedPort": "80",
                                     "sourceAddresses": [
                                         "*"
