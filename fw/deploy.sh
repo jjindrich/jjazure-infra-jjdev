@@ -8,3 +8,4 @@ az network vnet subnet update -g $rg -n DmzAks --vnet-name JJDevV2NetworkApp --r
 az network vnet subnet update -g $rg -n DmzApp --vnet-name JJDevV2NetworkApp --route-table jjdevv2fw-rt
 az network vnet subnet update -g $rg -n GatewaySubnet --vnet-name JJDevV2Network --route-table jjdevv2fw-vpn-rt
 az network vnet subnet update -g $rg -n AzureApplicationGatewaySubnet --vnet-name JJDevV2Network --route-table jjdevv2fw-appgw-rt
+az network vnet subnet update -g $rg -n DmzApiMngmt --vnet-name JJDevV2Network --route-table jjdevv2fw-apimngmt-rt

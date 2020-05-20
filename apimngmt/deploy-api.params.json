@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "value": "jjdevv2api"
+        },
+        "adminEmail": {
+            "value": "jajindri@microsoft.com"
+        },
+        "orgName": {
+            "value": "JJ Dev"
+        },
+        "tier": {
+            "value": "Developer"
+        },
+        "capacity": {
+            "value": 1
+        }
+    }
+}

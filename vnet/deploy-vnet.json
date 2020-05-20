@@ -119,6 +119,33 @@
             }
         },
         {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-11-01",
+            "name": "[concat(parameters('vnetHubName'),'-ApiMngmtSubnet')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "ApiMngmt-magagement",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3443",
+                            "sourceAddressPrefix": "ApiManagement",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 300,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2019-11-01",
             "name": "[parameters('vnetHubName')]",
@@ -188,6 +215,21 @@
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
+                    },
+                    {
+                        "name": "DmzApiMngmt",
+                        "properties": {
+                            "addressPrefix": "10.3.251.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetHubName'),'-ApiMngmt'))]"
+                            },
+                            "serviceEndpoints": [
+                            ],
+                            "delegations": [
+                            ],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
                     }
                 ],
                 "enableDdosProtection": false,
@@ -214,7 +256,7 @@
                     {
                         "name": "HTTP",
                         "properties": {
-                         "protocol": "TCP",
+                            "protocol": "TCP",
                             "sourcePortRange": "*",
                             "destinationPortRange": "80",
                             "sourceAddressPrefix": "AzureFrontDoor.Backend",
@@ -222,10 +264,14 @@
                             "access": "Allow",
                             "priority": 300,
                             "direction": "Inbound",
-                            "sourcePortRanges": [],
-                            "destinationPortRanges": [],
-                            "sourceAddressPrefixes": [],
-                            "destinationAddressPrefixes": []
+                            "sourcePortRanges": [
+                            ],
+                            "destinationPortRanges": [
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": [
+                            ]
                         }
                     }
                 ]

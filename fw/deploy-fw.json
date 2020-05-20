@@ -36,6 +36,9 @@
         },
         "routeTablesNameAppGw": {
             "type": "String"
+        },
+        "routeTablesNameApiMngmt": {
+            "type": "String"
         }
     },
     "variables": {
@@ -166,6 +169,25 @@
                         "name": "HubDmzInfraToFw",
                         "properties": {
                             "addressPrefix": "10.3.250.0/24",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-07-01",
+            "name": "[parameters('routeTablesNameApiMngmt')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "disableBgpRoutePropagation": false,
+                "routes": [
+                    {
+                        "name": "AppToFw",
+                        "properties": {
+                            "addressPrefix": "10.4.0.0/16",
                             "nextHopType": "VirtualAppliance",
                             "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }

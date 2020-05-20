@@ -10,3 +10,8 @@ cd ..
 
 cd appgw
 ./deploy.sh
+
+cd ..
+
+cd apimngmt
+./deploy.sh

@@ -25,6 +25,10 @@
         },
         "routeTablesNameAppGw": {
             "value": "jjdevv2fw-appgw-rt"
+        },
+        "routeTablesNameApiMngmt": {
+            "value": "jjdevv2fw-apimngmt-rt"
         }
+
     }
 }
