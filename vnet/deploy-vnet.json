@@ -221,7 +221,7 @@
                         "properties": {
                             "addressPrefix": "10.3.251.0/24",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetHubName'),'-ApiMngmt'))]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetHubName'),'-ApiMngmtSubnet'))]"
                             },
                             "serviceEndpoints": [
                             ],
