@@ -172,7 +172,16 @@
                             "nextHopType": "VirtualAppliance",
                             "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
+                    },
+                    {
+                        "name": "HubApiMngmtToFw",
+                        "properties": {
+                            "addressPrefix": "10.3.251.0/24",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
                     }
+
                 ]
             }
         },
@@ -199,7 +208,16 @@
                             "nextHopType": "VirtualAppliance",
                             "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
+                    },
+                    {
+                        "name": "HubDmzAppgwtToFw",
+                        "properties": {
+                            "addressPrefix": "10.3.253.0/24",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
                     }
+
                 ]
             }
         },
@@ -335,6 +353,50 @@
                                     "destinationPorts": [
                                         "80"
                                     ]
+                                },
+                                {
+                                    "name": "HTTPADDCtoApiMngmt",
+                                    "protocols": [
+                                        "TCP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "10.3.250.0/24"
+                                    ],
+                                    "destinationAddresses": [
+                                        "10.3.251.0/24"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ],
+                                    "destinationIpGroups": [
+                                    ],
+                                    "destinationFqdns": [
+                                    ],
+                                    "destinationPorts": [
+                                        "80",
+                                        "443"
+                                    ]
+                                },
+                                {
+                                    "name": "HTTPAppGwtoApiMngmt",
+                                    "protocols": [
+                                        "TCP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "10.3.253.0/24"
+                                    ],
+                                    "destinationAddresses": [
+                                        "10.3.251.0/24"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ],
+                                    "destinationIpGroups": [
+                                    ],
+                                    "destinationFqdns": [
+                                    ],
+                                    "destinationPorts": [
+                                        "80",
+                                        "443"
+                                    ]
                                 }
                             ]
                         }
@@ -463,6 +525,38 @@
                                     ],
                                     "destinationPorts": [
                                         "1688"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "AKS",
+                        "properties": {
+                            "priority": 1005,
+                            "action": {
+                                "type": "Allow"
+                            },
+                            "rules": [
+                                {
+                                    "name": "AksInternal",
+                                    "protocols": [
+                                        "Any"
+                                    ],
+                                    "sourceAddresses": [
+                                        "10.4.2.0/24"
+                                    ],
+                                    "destinationAddresses": [
+                                        "10.4.2.0/24"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ],
+                                    "destinationIpGroups": [
+                                    ],
+                                    "destinationFqdns": [
+                                    ],
+                                    "destinationPorts": [
+                                        "*"
                                     ]
                                 }
                             ]
