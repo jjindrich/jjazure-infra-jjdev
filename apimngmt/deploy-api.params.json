@@ -16,6 +16,12 @@
         },
         "capacity": {
             "value": 1
+        },
+        "virtualNetworkName": {
+            "value": "JJDevV2Network"
+        },
+        "subnetName": {
+            "value": "DmzApiMngmt"
         }
     }
 }

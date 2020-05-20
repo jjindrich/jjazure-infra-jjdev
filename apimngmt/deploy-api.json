@@ -16,7 +16,16 @@
         },
         "capacity": {
             "type": "int"
+        },
+        "virtualNetworkName": {
+            "type": "string"
+        },
+        "subnetName": {
+            "type": "string"
         }
+    },
+    "variables": {
+        "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
     },
     "resources": [
         {
@@ -30,7 +39,11 @@
             },
             "properties": {
                 "publisherEmail": "[parameters('adminEmail')]",
-                "publisherName": "[parameters('orgName')]"
+                "publisherName": "[parameters('orgName')]",
+                "virtualNetworkType": "Internal",
+                "virtualNetworkConfiguration": {
+                    "subnetResourceId": "[concat(variables('vnetId'), '/subnets/',parameters('subnetName'))]"
+                }
             }
         }
     ]

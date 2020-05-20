@@ -191,6 +191,14 @@
                             "nextHopType": "VirtualAppliance",
                             "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
+                    },
+                    {
+                        "name": "HubDmzInfraToFw",
+                        "properties": {
+                            "addressPrefix": "10.3.250.0/24",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
                     }
                 ]
             }

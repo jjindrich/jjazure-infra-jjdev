@@ -1,7 +1,7 @@
 rg='JJDevV2-Infra'
 
 # install firewall and add routes
-az group deployment create -g $rg --template-file deploy-fw.json --parameters deploy-fw.params.json
+az deployment group create -g $rg --template-file deploy-fw.json --parameters deploy-fw.params.json
 
 az network vnet subnet update -g $rg -n DmzInfra --vnet-name JJDevV2Network --route-table jjdevv2fw-rt
 az network vnet subnet update -g $rg -n DmzAks --vnet-name JJDevV2NetworkApp --route-table jjdevv2fw-rt
