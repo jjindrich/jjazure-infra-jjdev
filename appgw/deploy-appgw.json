@@ -28,6 +28,18 @@
         },
         "publicIpPrefix": {
             "type": "string"
+        },
+        "identityId": {
+            "type": "string"
+        },
+        "identityPrincipalId": {
+            "type": "string"
+        },
+        "identityClientId": {
+            "type": "string"
+        },
+        "certificateSecretId": {
+            "type": "string"
         }
     },
     "variables": {
@@ -64,6 +76,15 @@
             "name": "[parameters('applicationGatewayName')]",
             "location": "[resourceGroup().location]",
             "zones": "[if(equals(length(parameters('availabilityZones')), 0), json('null'), parameters('availabilityZones'))]",
+            "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                    "[concat(subscription().id,parameters('identityId'))]": {
+                        "principalId": "[parameters('identityPrincipalId')]",
+                        "clientId": "[parameters('identityClientId')]"
+                    }
+                }
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpAddress'))]"
             ],
@@ -83,6 +104,12 @@
                     }
                 ],
                 "sslCertificates": [
+                    {
+                        "name": "listen-public-sslvaultCert",
+                        "properties": {
+                            "keyVaultSecretId": "[parameters('certificateSecretId')]"
+                        }
+                    }
                 ],
                 "trustedRootCertificates": [
                 ],
@@ -119,6 +146,12 @@
                         "properties": {
                             "port": 8080
                         }
+                    },
+                    {
+                        "name": "port_443",
+                        "properties": {
+                            "port": 443
+                        }
                     }
                 ],
                 "backendAddressPools": [
@@ -142,7 +175,7 @@
                             ]
                         }
                     },
-                                   {
+                    {
                         "name": "jjaks",
                         "properties": {
                             "backendAddresses": [
@@ -195,6 +228,24 @@
                             ],
                             "requireServerNameIndication": false
                         }
+                    },
+                    {
+                        "name": "listen-public-ssl",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendIPConfigurations/appGwPublicFrontendIp')]"
+                            },
+                            "frontendPort": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendPorts/port_443')]"
+                            },
+                            "protocol": "Https",
+                            "sslCertificate": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/sslCertificates/listen-public-sslvaultCert')]"
+                            },
+                            "hostNames": [
+                            ],
+                            "requireServerNameIndication": false
+                        }
                     }
                 ],
                 "urlPathMaps": [
@@ -205,7 +256,7 @@
                         "properties": {
                             "ruleType": "Basic",
                             "httpListener": {
-                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/httpListeners/listen-public')]"
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/httpListeners/listen-public-ssl')]"
                             },
                             "backendAddressPool": {
                                 "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/backendAddressPools/jjaks')]"
@@ -257,7 +308,8 @@
                         }
                     }
                 ],
-                "redirectConfigurations": [],
+                "redirectConfigurations": [
+                ],
                 "enableHttp2": false,
                 "autoscaleConfiguration": {
                     "minCapacity": 0,
@@ -308,10 +360,12 @@
                         {
                             "ruleSetType": "OWASP",
                             "ruleSetVersion": "3.0",
-                            "ruleGroupOverrides": []
+                            "ruleGroupOverrides": [
+                            ]
                         }
                     ],
-                    "exclusions": []
+                    "exclusions": [
+                    ]
                 }
             }
         }
