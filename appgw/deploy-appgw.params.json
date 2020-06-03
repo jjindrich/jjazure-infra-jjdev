@@ -18,13 +18,7 @@
             "value": "jjdevv2network-pip"
         },
         "identityId": {
-            "value": "/resourcegroups/JJDevV2-Infra/providers/Microsoft.ManagedIdentity/userAssignedIdentities/jjappgw-identity"
-        },
-        "identityPrincipalId": {
-            "value": "ebbe7730-c47e-4d93-ae2e-cabd100fc7e3"
-        },
-        "identityClientId": {
-            "value": "4f7d7ab2-a370-4df6-8fdd-f887ace5c977"
+            "value": "/resourceGroups/JJDevV2-Infra/providers/Microsoft.ManagedIdentity/userAssignedIdentities/jjappgw-identity"
         },
         "certificateSecretId": {
             "value": "https://jjkeyvault.vault.azure.net/secrets/jjappgw-jjdev-orgcf5c87d0-9a80-442f-b5ee-d11cdc275be0/5194c1d072fe433aac35f09d89c291d5"

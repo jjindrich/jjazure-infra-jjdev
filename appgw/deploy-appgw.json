@@ -32,12 +32,6 @@
         "identityId": {
             "type": "string"
         },
-        "identityPrincipalId": {
-            "type": "string"
-        },
-        "identityClientId": {
-            "type": "string"
-        },
         "certificateSecretId": {
             "type": "string"
         }
@@ -78,11 +72,8 @@
             "zones": "[if(equals(length(parameters('availabilityZones')), 0), json('null'), parameters('availabilityZones'))]",
             "identity": {
                 "type": "UserAssigned",
-                "userAssignedIdentities": {
-                    "[concat(subscription().id,parameters('identityId'))]": {
-                        "principalId": "[parameters('identityPrincipalId')]",
-                        "clientId": "[parameters('identityClientId')]"
-                    }
+                "userAssignedIdentities" : {
+                    "[concat(subscription().id,parameters('identityId'))]": {}
                 }
             },
             "dependsOn": [
