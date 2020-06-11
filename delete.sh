@@ -8,7 +8,7 @@ cd appgw
 
 cd ..
 
-cd appmngmt
+cd apimngmt
 ./delete.sh
 
 cd ..
