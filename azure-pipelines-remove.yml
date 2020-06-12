@@ -52,7 +52,7 @@ stages:
           scriptLocation: 'inlineScript'
           inlineScript: './delete.sh'
           workingDirectory: 'appgw'    
-    - job: 'DestroyAppGw'
+    - job: 'DestroyApiMngmt'
       displayName: 'Destroy API management'
       condition: and(succeeded(), eq('${{ parameters.DestroyApiMngmt }}', true))
       steps:
