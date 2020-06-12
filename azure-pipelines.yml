@@ -28,15 +28,24 @@ stages:
     displayName: 'Deploy firewall'    
     dependsOn: 'DeployVnet'
     steps:
-    - script: chmod +x fw/*.sh
-    - script: ./deploy.sh
-      displayName: 'Fw deploy'
-      workingDirectory: fw      
+      - script: chmod +x fw/*.sh
+      - task: AzureCLI@2
+        displayName: 'Fw deploy'      
+        inputs:
+          azureSubscription: $(subscription)
+          scriptType: bash
+          scriptPath: ./deploy.sh
+          workingDirectory: fw
   - job: 'DeployAppGw'
     displayName: 'Deploy application gateway'
     dependsOn: 'DeployVnet'
     steps:
-    - script: chmod +x appgw/*.sh
-    - script: ./deploy.sh
-      displayName: 'AppGw deploy'
-      workingDirectory: appgw   
+      - script: chmod +x appgw/*.sh
+      - task: AzureCLI@2
+        displayName: 'AppGw deploy'      
+        inputs:
+          azureSubscription: $(subscription)
+          scriptType: bash
+          scriptPath: ./deploy.sh
+          workingDirectory: appgw
+  
