@@ -1,3 +1,5 @@
+name: $(date:yyyyMMdd)$(rev:.r)
+
 trigger:
 - master
 
@@ -5,6 +7,6 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: deploy.sh
+- script: ls
   displayName: 'Vnet deploy'
   workingDirectory: vnet
