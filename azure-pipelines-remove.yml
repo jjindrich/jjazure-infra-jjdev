@@ -1,0 +1,67 @@
+name: $(date:yyyyMMdd)$(rev:.r)
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+parameters:
+- name: DestroyFirewall
+  displayName: "Destroy Firewall"
+  default: true
+  type: boolean
+- name: DestroyAppGw
+  displayName: "Destroy Application gateway"
+  default: true
+  type: boolean
+- name: DestroyApiMngmt
+  displayName: "Destroy API management"
+  default: false
+  type: boolean
+
+variables:
+  subscription: 'JJ Microsoft Azure Internal Consumption (82fb79bf-ee69-4a57-a76c-26153e544afe)'
+  
+stages:
+- stage: 'Destroy'
+  displayName: 'Destroy resources'
+  jobs:
+    - job: 'DestroyFw'
+      displayName: 'Destroy firewall'
+      condition: and(succeeded(), eq('${{ parameters.DestroyFirewall }}', true))
+      steps:
+      - script: chmod +x fw/*.sh
+      - task: AzureCLI@2
+        displayName: 'Fw destroy'      
+        inputs:
+          azureSubscription: $(subscription)
+          scriptType: bash
+          scriptLocation: 'inlineScript'
+          inlineScript: './delete.sh'
+          workingDirectory: 'fw'    
+    - job: 'DestroyAppGw'
+      displayName: 'Destroy application gateway'
+      condition: and(succeeded(), eq('${{ parameters.DestroyAppGw }}', true))
+      steps:
+      - script: chmod +x appgw/*.sh
+      - task: AzureCLI@2
+        displayName: 'AppGw destroy'      
+        inputs:
+          azureSubscription: $(subscription)
+          scriptType: bash
+          scriptLocation: 'inlineScript'
+          inlineScript: './delete.sh'
+          workingDirectory: 'appgw'    
+    - job: 'DestroyAppGw'
+      displayName: 'Destroy API management'
+      condition: and(succeeded(), eq('${{ parameters.DestroyApiMngmt }}', true))
+      steps:
+      - script: chmod +x apimngmt/*.sh
+      - task: AzureCLI@2
+        displayName: 'API management destroy'      
+        inputs:
+          azureSubscription: $(subscription)
+          scriptType: bash
+          scriptLocation: 'inlineScript'
+          inlineScript: './delete.sh'
+          workingDirectory: 'apimngmt' 
