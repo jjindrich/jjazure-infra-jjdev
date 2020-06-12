@@ -59,7 +59,7 @@ stages:
         workingDirectory: 'appgw'
   - job: 'DeployApiMngmt'
     displayName: 'Deploy API management'
-    dependsOn: 'DeployApi'
+    dependsOn: 'DeployVnet'
     condition: and(succeeded(), eq('${{ parameters.DeployApiMngmt }}', true))
     steps:
     - script: chmod +x apimngmt/*.sh
