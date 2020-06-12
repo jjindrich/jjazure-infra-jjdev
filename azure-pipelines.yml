@@ -22,8 +22,7 @@ stages:
       inputs:
         azureSubscription: $(subscription)
         scriptType: bash
-        scriptPath: ./deploy.sh
-        workingDirectory: vnet
+        scriptPath: ./vnet/deploy.sh
   - job: 'DeployFw'
     displayName: 'Deploy firewall'    
     dependsOn: 'DeployVnet'
@@ -34,8 +33,7 @@ stages:
         inputs:
           azureSubscription: $(subscription)
           scriptType: bash
-          scriptPath: ./deploy.sh
-          workingDirectory: fw
+          scriptPath: ./fw/deploy.sh
   - job: 'DeployAppGw'
     displayName: 'Deploy application gateway'
     dependsOn: 'DeployVnet'
@@ -46,6 +44,4 @@ stages:
         inputs:
           azureSubscription: $(subscription)
           scriptType: bash
-          scriptPath: ./deploy.sh
-          workingDirectory: appgw
-  
+          scriptPath: ./appgw/deploy.sh  
