@@ -6,6 +6,8 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+stages:
+
 - stage: 'Deploy'
   displayName: 'Deploy'
   jobs:
@@ -16,9 +18,21 @@ pool:
     - script: chmod +x fw/*.sh
     - script: chmod +x appgw/*.sh
     - script: chmod +x appgw/*.sh    
-  - job: 'PlanDeploy'
-    displayName: 'Plan and Deploy'
+  - job: 'DeployVnet'
+    displayName: 'Deploy virtual network'
     steps:
     - script: ./deploy.sh
       displayName: 'Vnet deploy'
       workingDirectory: vnet
+  - job: 'DeployFw'
+    displayName: 'Deploy firewall'
+    steps:
+    - script: ./deploy.sh
+      displayName: 'Fw deploy'
+      workingDirectory: fw      
+  - job: 'DeployAppGw'
+    displayName: 'Deploy application gateway'
+    steps:
+    - script: ./deploy.sh
+      displayName: 'AppGw deploy'
+      workingDirectory: appgw   
