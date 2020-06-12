@@ -28,7 +28,7 @@ stages:
   displayName: 'Deploy'
   jobs:
   - job: 'DeployVnet'
-    displayName: 'Deploy virtual network'    
+    displayName: 'Deploy Virtual network'    
     steps:
     - script: chmod +x vnet/*.sh
     - task: AzureCLI@2
@@ -40,7 +40,7 @@ stages:
         inlineScript: './deploy.sh'
         workingDirectory: 'vnet'
   - job: 'DeployFw'
-    displayName: 'Deploy firewall'    
+    displayName: 'Deploy Firewall'    
     dependsOn: 'DeployVnet'
     condition: and(succeeded(), eq('${{ parameters.DeployFirewall }}', true))
     steps:
@@ -54,7 +54,7 @@ stages:
         inlineScript: './deploy.sh'
         workingDirectory: 'fw'
   - job: 'DeployAppGw'
-    displayName: 'Deploy application gateway'
+    displayName: 'Deploy Application gateway'
     dependsOn: 'DeployVnet'
     condition: and(succeeded(), eq('${{ parameters.DeployAppGw }}', true))
     steps:
