@@ -24,6 +24,13 @@ stages:
         scriptType: bash
         scriptPath: './deploy.sh'
         workingDirectory: 'vnet'
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: $(subscription)
+        scriptType: bash
+        scriptLocation: 'inlineScript'
+        inlineScript: 'ls'
+        workingDirectory: 'vnet'
   - job: 'DeployFw'
     displayName: 'Deploy firewall'    
     dependsOn: 'DeployVnet'
