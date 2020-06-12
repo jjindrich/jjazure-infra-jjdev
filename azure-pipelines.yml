@@ -11,28 +11,26 @@ stages:
 - stage: 'Deploy'
   displayName: 'Deploy'
   jobs:
-  - job: 'Fix'
-    displayName: 'Fix scripts'
-    steps:
-    - script: chmod +x vnet/*.sh
-    - script: chmod +x fw/*.sh
-    - script: chmod +x appgw/*.sh
-    - script: chmod +x appgw/*.sh    
   - job: 'DeployVnet'
     displayName: 'Deploy virtual network'
     steps:
+    - script: chmod +x vnet/*.sh
     - script: ./deploy.sh
       displayName: 'Vnet deploy'
       workingDirectory: vnet
   - job: 'DeployFw'
-    displayName: 'Deploy firewall'
+    displayName: 'Deploy firewall'    
+    dependsOn: 'DeployVnet'
     steps:
+    - script: chmod +x fw/*.sh
     - script: ./deploy.sh
       displayName: 'Fw deploy'
       workingDirectory: fw      
   - job: 'DeployAppGw'
     displayName: 'Deploy application gateway'
+    dependsOn: 'DeployVnet'
     steps:
+    - script: chmod +x appgw/*.sh
     - script: ./deploy.sh
       displayName: 'AppGw deploy'
       workingDirectory: appgw   
