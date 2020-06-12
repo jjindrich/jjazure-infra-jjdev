@@ -6,9 +6,8 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-stages:
-- stage: 'Prepare'
-  displayName: 'Prepare'
+- stage: 'Deploy'
+  displayName: 'Deploy'
   jobs:
   - job: 'Fix'
     displayName: 'Fix scripts'
@@ -17,10 +16,6 @@ stages:
     - script: chmod +x fw/*.sh
     - script: chmod +x appgw/*.sh
     - script: chmod +x appgw/*.sh    
-
-- stage: 'Deploy'
-  displayName: 'Deploy'
-  jobs:
   - job: 'PlanDeploy'
     displayName: 'Plan and Deploy'
     steps:
