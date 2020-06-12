@@ -6,6 +6,12 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+parameters:
+- name: DeployApiMngmt
+  displayName: "Deploy API management"
+  default: false
+  type: boolean
+
 variables:
   subscription: 'JJ Microsoft Azure Internal Consumption (82fb79bf-ee69-4a57-a76c-26153e544afe)'
   
@@ -35,7 +41,8 @@ stages:
       inputs:
         azureSubscription: $(subscription)
         scriptType: bash
-        scriptPath: './deploy.sh'
+        scriptLocation: 'inlineScript'
+        inlineScript: './deploy.sh'
         workingDirectory: 'fw'
   - job: 'DeployAppGw'
     displayName: 'Deploy application gateway'
@@ -47,5 +54,21 @@ stages:
       inputs:
         azureSubscription: $(subscription)
         scriptType: bash
-        scriptPath: './deploy.sh'
+        scriptLocation: 'inlineScript'
+        inlineScript: './deploy.sh'
         workingDirectory: 'appgw'
+  - job: 'DeployApiMngmt'
+    displayName: 'Deploy API management'
+    dependsOn: 'DeployApi'
+    condition: and(succeeded(), eq('${{ parameters.DeployApiMngmt }}', true))
+    steps:
+    - script: chmod +x apimngmt/*.sh
+    - task: AzureCLI@2
+      displayName: 'API management deploy'      
+      inputs:
+        azureSubscription: $(subscription)
+        scriptType: bash
+        scriptLocation: 'inlineScript'
+        inlineScript: './deploy.sh'
+        workingDirectory: 'apimngmt'
+    
