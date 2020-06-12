@@ -7,6 +7,6 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: ls
+- script: ./deploy.sh
   displayName: 'Vnet deploy'
   workingDirectory: vnet
