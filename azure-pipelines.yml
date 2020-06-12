@@ -13,25 +13,17 @@ stages:
 - stage: 'Deploy'
   displayName: 'Deploy'
   jobs:
-  - job: 'CLI'
-    steps:
-      - task: AzureCLI@2
-        displayName: Azure CLI
-        inputs:
-          azureSubscription: $(subscription)
-          scriptType: bash
-          scriptLocation: inlineScript
-          inlineScript: |
-            az --version
-            az account show
-
   - job: 'DeployVnet'
     displayName: 'Deploy virtual network'    
     steps:
     - script: chmod +x vnet/*.sh
-    - script: ./deploy.sh
-      displayName: 'Vnet deploy'
-      workingDirectory: vnet
+    - task: AzureCLI@2
+      displayName: 'Vnet deploy'      
+      inputs:
+        azureSubscription: $(subscription)
+        scriptType: bash
+        scriptPath: ./deploy.sh
+        workingDirectory: vnet
   - job: 'DeployFw'
     displayName: 'Deploy firewall'    
     dependsOn: 'DeployVnet'
