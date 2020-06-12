@@ -7,17 +7,17 @@ pool:
   vmImage: 'ubuntu-latest'
 
 parameters:
-- name: DeployApiMngmt
-  displayName: "Deploy API management"
-  default: false
+- name: DeployFirewall
+  displayName: "Deploy Firewall"
+  default: true
   type: boolean
 - name: DeployAppGw
   displayName: "Deploy Application gateway"
   default: true
   type: boolean
-- name: DeployFirewall
-  displayName: "Deploy Firewall"
-  default: true
+- name: DeployApiMngmt
+  displayName: "Deploy API management"
+  default: false
   type: boolean
 
 variables:
