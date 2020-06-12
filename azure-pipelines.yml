@@ -1,0 +1,10 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: deploy.sh
+  displayName: 'Vnet deploy'
+  workingDirectory: vnet
