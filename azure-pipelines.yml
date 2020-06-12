@@ -6,13 +6,27 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  subscription: 'JJ Microsoft Azure Internal Consumption (82fb79bf-ee69-4a57-a76c-26153e544afe)'
+  
 stages:
-
 - stage: 'Deploy'
   displayName: 'Deploy'
   jobs:
+  - job: 'CLI'
+    steps:
+      - task: AzureCLI@2
+        displayName: Azure CLI
+        inputs:
+          azureSubscription: $(subscription)
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            az --version
+            az account show
+
   - job: 'DeployVnet'
-    displayName: 'Deploy virtual network'
+    displayName: 'Deploy virtual network'    
     steps:
     - script: chmod +x vnet/*.sh
     - script: ./deploy.sh
