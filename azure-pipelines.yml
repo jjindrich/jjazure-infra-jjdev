@@ -82,6 +82,7 @@ stages:
     displayName: 'Deploy API management'
     dependsOn: 'DeployVnet'
     condition: and(succeeded(), eq('${{ parameters.DeployApiMngmt }}', true))
+    cancelTimeoutInMinutes: 20
     steps:
     - script: chmod +x apimngmt/*.sh
     - task: AzureCLI@2
@@ -91,5 +92,5 @@ stages:
         scriptType: bash
         scriptLocation: 'inlineScript'
         inlineScript: './deploy.sh'
-        workingDirectory: 'apimngmt'
+        workingDirectory: 'apimngmt'        
     
