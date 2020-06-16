@@ -27,6 +27,17 @@ stages:
 - stage: 'Deploy'
   displayName: 'Deploy'
   jobs:
+  - job: 'StartDNS'
+    displayName: 'Start DNS server in virtual network'    
+    steps:
+    - script: chmod +x vnet/*.sh
+    - task: AzureCLI@2
+      displayName: 'Start DNS VM'      
+      inputs:
+        azureSubscription: $(subscription)
+        scriptType: bash
+        scriptLocation: 'inlineScript'
+        inlineScript: 'az vm start -n jjdevv2addc -g jjdevv2-vm'
   - job: 'DeployVnet'
     displayName: 'Deploy Virtual network'    
     steps:
