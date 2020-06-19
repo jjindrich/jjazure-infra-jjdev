@@ -157,9 +157,9 @@
             "properties": {
                 "securityRules": [
                     {
-                        "name": "ApiMngmt-magagement",
+                        "name": "Https",
                         "properties": {
-                            "protocol": "*",
+                            "protocol": "TCP",
                             "sourcePortRange": "*",
                             "destinationPortRange": "443",
                             "sourceAddressPrefix": "*",
