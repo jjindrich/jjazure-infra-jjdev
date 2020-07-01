@@ -261,7 +261,8 @@
                                         "*"
                                     ],
                                     "destinationAddresses": [
-                                        "*"
+                                        "10.3.0.0/16",
+                                        "10.4.0.0/16"
                                     ],
                                     "destinationPorts": [
                                         "3389"
@@ -276,7 +277,8 @@
                                         "*"
                                     ],
                                     "destinationAddresses": [
-                                        "*"
+                                        "10.3.0.0/16",
+                                        "10.4.0.0/16"
                                     ],
                                     "destinationPorts": [
                                         "22"
