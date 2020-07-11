@@ -103,11 +103,27 @@
                         }
                     },
                     {
-                        "name": "HubToFw",
+                        "name": "HubDmzAppgwtToFw",
                         "properties": {
-                            "addressPrefix": "10.3.0.0/16",
+                            "addressPrefix": "10.3.253.0/24",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                            "nextHopIpAddress": "10.3.252.4"
+                        }
+                    },
+                    {
+                        "name": "HubDmzInfraToFw",
+                        "properties": {
+                            "addressPrefix": "10.3.250.0/24",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.3.252.4"
+                        }
+                    },
+                    {
+                        "name": "HubApiMngmtToFw",
+                        "properties": {
+                            "addressPrefix": "10.3.251.0/24",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.3.252.4"
                         }
                     }
                 ]
