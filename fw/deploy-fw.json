@@ -457,7 +457,7 @@
                                         "*"
                                     ],
                                     "destinationAddresses": [
-                                        "91.189.89.198"
+                                        "*"
                                     ],
                                     "sourceIpGroups": [
                                     ],
@@ -557,7 +557,7 @@
                             },
                             "rules": [
                                 {
-                                    "name": "AksInternal",
+                                    "name": "AksSubnet",
                                     "protocols": [
                                         "Any"
                                     ],
@@ -575,6 +575,28 @@
                                     ],
                                     "destinationPorts": [
                                         "*"
+                                    ]
+                                },
+                                {
+                                    "name": "AksInternal",
+                                    "protocols": [
+                                        "Any"
+                                    ],
+                                    "sourceAddresses": [
+                                        "10.4.2.0/24"
+                                    ],
+                                    "destinationAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ],
+                                    "destinationIpGroups": [
+                                    ],
+                                    "destinationFqdns": [
+                                    ],
+                                    "destinationPorts": [
+                                        "9000",
+                                        "1194"
                                     ]
                                 }
                             ]
@@ -1002,6 +1024,25 @@
                                     ],
                                     "targetFqdns": [
                                         "acs-mirror.azureedge.net"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ]
+                                },
+                                {
+                                    "name": "appconfig",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [
+                                    ],
+                                    "targetFqdns": [
+                                        "jjaksconfig.azconfig.io"
                                     ],
                                     "sourceAddresses": [
                                         "*"
