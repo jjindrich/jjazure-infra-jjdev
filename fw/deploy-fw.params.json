@@ -17,18 +17,20 @@
         "publicIpPrefix": {
             "value": "jjdevv2network-pip"
         },        
-        "routeTablesName": {
-            "value": "jjdevv2fw-rt"
+        "routeTablesNameInfra": {
+            "value": "jjdevv2fw-hubinfra-rt"
         },
         "routeTablesNameVpn": {
-            "value": "jjdevv2fw-vpn-rt"
+            "value": "jjdevv2fw-hubvpn-rt"
         },
         "routeTablesNameAppGw": {
-            "value": "jjdevv2fw-appgw-rt"
+            "value": "jjdevv2fw-hubappgw-rt"
         },
         "routeTablesNameApiMngmt": {
-            "value": "jjdevv2fw-apimngmt-rt"
+            "value": "jjdevv2fw-hubapimngmt-rt"
+        },
+        "routeTablesNameSpokeApp": {
+            "value": "jjdevv2fw-spokeapp-rt"
         }
-
     }
 }

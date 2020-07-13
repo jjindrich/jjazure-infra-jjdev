@@ -28,7 +28,7 @@
         "publicIpPrefix": {
             "type": "string"
         },
-        "routeTablesName": {
+        "routeTablesNameInfra": {
             "type": "String"
         },
         "routeTablesNameVpn": {
@@ -38,6 +38,9 @@
             "type": "String"
         },
         "routeTablesNameApiMngmt": {
+            "type": "String"
+        },
+        "routeTablesNameSpokeApp": {
             "type": "String"
         }
     },
@@ -73,7 +76,7 @@
         {
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "2019-07-01",
-            "name": "[parameters('routeTablesName')]",
+            "name": "[parameters('routeTablesNameInfra')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "disableBgpRoutePropagation": false,
@@ -95,7 +98,7 @@
                         }
                     },
                     {
-                        "name": "AppToFw",
+                        "name": "SpokeAppToFw",
                         "properties": {
                             "addressPrefix": "10.4.0.0/16",
                             "nextHopType": "VirtualAppliance",
@@ -106,14 +109,6 @@
                         "name": "HubDmzAppgwtToFw",
                         "properties": {
                             "addressPrefix": "10.3.253.0/24",
-                            "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
-                        }
-                    },
-                    {
-                        "name": "HubDmzInfraToFw",
-                        "properties": {
-                            "addressPrefix": "10.3.250.0/24",
                             "nextHopType": "VirtualAppliance",
                             "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
@@ -146,7 +141,7 @@
                         }
                     },
                     {
-                        "name": "AppToFw",
+                        "name": "SpokeAppToFw",
                         "properties": {
                             "addressPrefix": "10.4.0.0/16",
                             "nextHopType": "VirtualAppliance",
@@ -174,7 +169,7 @@
                         }
                     },
                     {
-                        "name": "AppToFw",
+                        "name": "SpokeAppToFw",
                         "properties": {
                             "addressPrefix": "10.4.0.0/16",
                             "nextHopType": "VirtualAppliance",
@@ -210,7 +205,7 @@
                 "disableBgpRoutePropagation": false,
                 "routes": [
                     {
-                        "name": "AppToFw",
+                        "name": "SpokeAppToFw",
                         "properties": {
                             "addressPrefix": "10.4.0.0/16",
                             "nextHopType": "VirtualAppliance",
@@ -234,6 +229,49 @@
                         }
                     }
 
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2019-07-01",
+            "name": "[parameters('routeTablesNameSpokeApp')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "disableBgpRoutePropagation": false,
+                "routes": [
+                    {
+                        "name": "InternetToFw",
+                        "properties": {
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
+                    },
+                    {
+                        "name": "HubDmzAppgwtToFw",
+                        "properties": {
+                            "addressPrefix": "10.3.253.0/24",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
+                    },
+                    {
+                        "name": "HubDmzInfraToFw",
+                        "properties": {
+                            "addressPrefix": "10.3.250.0/24",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
+                    },
+                    {
+                        "name": "HubApiMngmtToFw",
+                        "properties": {
+                            "addressPrefix": "10.3.251.0/24",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
+                        }
+                    }
                 ]
             }
         },
