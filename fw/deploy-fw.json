@@ -603,30 +603,10 @@
                             },
                             "rules": [
                                 {
-                                    "name": "AksSubnet",
-                                    "protocols": [
-                                        "Any"
-                                    ],
-                                    "sourceAddresses": [
-                                        "10.4.2.0/24"
-                                    ],
-                                    "destinationAddresses": [
-                                        "10.4.2.0/24"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ],
-                                    "destinationIpGroups": [
-                                    ],
-                                    "destinationFqdns": [
-                                    ],
-                                    "destinationPorts": [
-                                        "*"
-                                    ]
-                                },
-                                {
                                     "name": "AksInternal",
                                     "protocols": [
-                                        "Any"
+                                        "UDP",
+                                        "TCP"
                                     ],
                                     "sourceAddresses": [
                                         "10.4.2.0/24"
@@ -642,7 +622,8 @@
                                     ],
                                     "destinationPorts": [
                                         "9000",
-                                        "1194"
+                                        "1194",
+                                        "443"
                                     ]
                                 }
                             ]
