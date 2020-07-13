@@ -475,7 +475,7 @@
                                         "*"
                                     ],
                                     "destinationAddresses": [
-                                        "10.3.250.10"
+                                        "*"
                                     ],
                                     "sourceIpGroups": [
                                     ],
@@ -532,6 +532,24 @@
                                     ]
                                 },
                                 {
+                                    "name": "DNSresponse",
+                                    "protocols": [
+                                        "UDP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "10.3.250.10"
+                                    ],
+                                    "destinationAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": [],
+                                    "destinationIpGroups": [],
+                                    "destinationFqdns": [],
+                                    "destinationPorts": [
+                                        "*"
+                                    ]
+                                },
+                                {
                                     "name": "AAD",
                                     "protocols": [
                                         "TCP"
@@ -551,18 +569,7 @@
                                     "destinationPorts": [
                                         "443"
                                     ]
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "WindowsKMS",
-                        "properties": {
-                            "priority": 1004,
-                            "action": {
-                                "type": "Allow"
-                            },
-                            "rules": [
+                                },
                                 {
                                     "name": "AzureGlobalKMS",
                                     "protocols": [
@@ -986,7 +993,7 @@
                                     "fqdnTags": [
                                     ],
                                     "targetFqdns": [
-                                        "mcr.microsoft.com"
+                                        "*.mcr.microsoft.com"
                                     ],
                                     "sourceAddresses": [
                                         "*"
@@ -1088,6 +1095,74 @@
                                     ],
                                     "sourceIpGroups": [
                                     ]
+                                },
+                                {
+                                    "name": "devops",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "*.services.visualstudio.com"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "monitoring",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "*.westeurope.monitoring.azure.com"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "events",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "*.events.data.microsoft.com"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "gcp",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [],
+                                    "targetFqdns": [
+                                        "*.k8s.gcr.io"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": []
                                 }
                             ]
                         }
