@@ -38,7 +38,8 @@ stages:
         scriptLocation: 'inlineScript'
         inlineScript: 'az vm start -n jjdevv2addc -g jjdevv2-vm'
   - job: 'DeployVnet'
-    displayName: 'Deploy Virtual network'    
+    displayName: 'Deploy Virtual network'   
+    dependsOn: 'StartDNS' 
     steps:
     - script: chmod +x vnet/*.sh
     - task: AzureCLI@2
@@ -65,7 +66,9 @@ stages:
         workingDirectory: 'fw'
   - job: 'DeployAppGw'
     displayName: 'Deploy Application gateway'
-    dependsOn: 'DeployVnet'
+    dependsOn: 
+      - 'DeployVnet'
+      - 'DeployFw'
     condition: and(succeeded(), eq('${{ parameters.DeployAppGw }}', true))
     steps:
     - script: chmod +x appgw/*.sh
@@ -79,7 +82,9 @@ stages:
         workingDirectory: 'appgw'
   - job: 'DeployApiMngmt'
     displayName: 'Deploy API management'
-    dependsOn: 'DeployVnet'
+    dependsOn: 
+      - 'DeployVnet'
+      - 'DeployFw'
     condition: and(succeeded(), eq('${{ parameters.DeployApiMngmt }}', true))
     cancelTimeoutInMinutes: 20
     steps:
