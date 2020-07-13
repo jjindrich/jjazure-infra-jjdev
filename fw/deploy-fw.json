@@ -748,7 +748,8 @@
                                     ],
                                     "targetFqdns": [
                                         "*.ods.opinsights.azure.com",
-                                        "*.oms.opinsights.azure.com"
+                                        "*.oms.opinsights.azure.com",
+                                        "*.monitoring.azure.com"
                                     ],
                                     "sourceAddresses": [
                                         "*"
@@ -917,7 +918,9 @@
                                     "fqdnTags": [
                                     ],
                                     "targetFqdns": [
-                                        "aksrepos.azurecr.io"
+                                        "aksrepos.azurecr.io",
+                                        "quay.io",
+                                        "*.quay.io"
                                     ],
                                     "sourceAddresses": [
                                         "*"
@@ -936,7 +939,9 @@
                                     "fqdnTags": [
                                     ],
                                     "targetFqdns": [
-                                        "packages.microsoft.com"
+                                        "packages.microsoft.com",
+                                        "api.snapcraft.io",
+                                        "motd.ubuntu.com"
                                     ],
                                     "sourceAddresses": [
                                         "*"
@@ -993,6 +998,7 @@
                                     "fqdnTags": [
                                     ],
                                     "targetFqdns": [
+                                        "mcr.microsoft.com",
                                         "*.mcr.microsoft.com"
                                     ],
                                     "sourceAddresses": [
@@ -1157,7 +1163,8 @@
                                     ],
                                     "fqdnTags": [],
                                     "targetFqdns": [
-                                        "*.k8s.gcr.io"
+                                        "k8s.gcr.io",
+                                        "storage.googleapis.com"
                                     ],
                                     "sourceAddresses": [
                                         "*"
