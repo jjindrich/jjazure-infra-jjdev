@@ -1151,6 +1151,27 @@
                                         "*"
                                     ],
                                     "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "AKSservice",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Http",
+                                            "port": 80
+                                        },
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [
+                                        "AzureKubernetesService"
+                                    ],
+                                    "targetFqdns": [],
+                                    "sourceAddresses": [
+                                        "10.4.2.0/24"
+                                    ],
+                                    "sourceIpGroups": []
                                 }
                             ]
                         }
