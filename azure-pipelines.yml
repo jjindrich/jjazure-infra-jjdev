@@ -66,9 +66,7 @@ stages:
         workingDirectory: 'fw'
   - job: 'DeployAppGw'
     displayName: 'Deploy Application gateway'
-    dependsOn: 
-      - 'DeployVnet'
-      - 'DeployFw'
+    dependsOn: 'DeployVnet'
     condition: and(succeeded(), eq('${{ parameters.DeployAppGw }}', true))
     steps:
     - script: chmod +x appgw/*.sh
@@ -82,9 +80,7 @@ stages:
         workingDirectory: 'appgw'
   - job: 'DeployApiMngmt'
     displayName: 'Deploy API management'
-    dependsOn: 
-      - 'DeployVnet'
-      - 'DeployFw'
+    dependsOn: 'DeployVnet'
     condition: and(succeeded(), eq('${{ parameters.DeployApiMngmt }}', true))
     cancelTimeoutInMinutes: 20
     steps:
