@@ -1064,25 +1064,6 @@
                                     ]
                                 },
                                 {
-                                    "name": "appconfig",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "jjaksconfig.azconfig.io"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
                                     "name": "devops",
                                     "protocols": [
                                         {
@@ -1150,6 +1131,44 @@
                                         "*"
                                     ],
                                     "sourceIpGroups": []
+                                },
+                                {
+                                    "name": "jjappconfig",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [
+                                    ],
+                                    "targetFqdns": [
+                                        "jjaksconfig.azconfig.io"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ]
+                                },
+                                {
+                                    "name": "jjrepo",
+                                    "protocols": [
+                                        {
+                                            "protocolType": "Https",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "fqdnTags": [
+                                    ],
+                                    "targetFqdns": [
+                                        "jjakscontainers.azurecr.io"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": [
+                                    ]
                                 },
                                 {
                                     "name": "AKSservice",
