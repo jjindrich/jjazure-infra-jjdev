@@ -631,7 +631,7 @@
                 ],
                 "applicationRuleCollections": [
                     {
-                        "name": "UpdatesWindows",
+                        "name": "Updates",
                         "properties": {
                             "priority": 1000,
                             "action": {
@@ -656,21 +656,11 @@
                                     "targetFqdns": [
                                     ],
                                     "sourceAddresses": [
+                                        "*"
                                     ]
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "UpdatesLinux",
-                        "properties": {
-                            "priority": 1010,
-                            "action": {
-                                "type": "Allow"
-                            },
-                            "rules": [
+                                },
                                 {
-                                    "name": "Updates",
+                                    "name": "LinuxUpdates",
                                     "protocols": [
                                         {
                                             "protocolType": "Http",
@@ -689,7 +679,7 @@
                                     ]
                                 },
                                 {
-                                    "name": "Packages",
+                                    "name": "MsPackages",
                                     "protocols": [
                                         {
                                             "protocolType": "Https",
