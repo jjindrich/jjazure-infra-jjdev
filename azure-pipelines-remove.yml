@@ -10,6 +10,10 @@ parameters:
   displayName: "Destroy Firewall"
   default: true
   type: boolean
+- name: DestroyFd
+  displayName: "Destroy FrontDoor"
+  default: true
+  type: boolean
 - name: DestroyAppGw
   displayName: "Destroy Application gateway"
   default: true
@@ -39,6 +43,19 @@ stages:
           scriptLocation: 'inlineScript'
           inlineScript: './delete.sh'
           workingDirectory: 'fw'    
+    - job: 'DestroyFd'
+      displayName: 'Destroy FrontDoor'
+      condition: and(succeeded(), eq('${{ parameters.DestroyFd }}', true))
+      steps:
+      - script: chmod +x fd/*.sh
+      - task: AzureCLI@2
+        displayName: 'FrontDoor destroy'      
+        inputs:
+          azureSubscription: $(subscription)
+          scriptType: bash
+          scriptLocation: 'inlineScript'
+          inlineScript: './delete.sh'
+          workingDirectory: 'fd'           
     - job: 'DestroyAppGw'
       displayName: 'Destroy application gateway'
       condition: and(succeeded(), eq('${{ parameters.DestroyAppGw }}', true))

@@ -8,11 +8,15 @@ pool:
 parameters:
 - name: DeployFirewall
   displayName: "Deploy Firewall"
+  default: false
+  type: boolean
+- name: DeployFd
+  displayName: "Deploy FrontDoor"
   default: true
   type: boolean
 - name: DeployAppGw
   displayName: "Deploy Application gateway"
-  default: true
+  default: false
   type: boolean
 - name: DeployApiMngmt
   displayName: "Deploy API management"
@@ -64,6 +68,20 @@ stages:
         scriptLocation: 'inlineScript'
         inlineScript: './deploy.sh'
         workingDirectory: 'fw'
+  - job: 'DeployFd'
+    displayName: 'Deploy FrontDoor'
+    dependsOn: 'DeployVnet'
+    condition: and(succeeded(), eq('${{ parameters.DeployFd }}', true))
+    steps:
+    - script: chmod +x fd/*.sh
+    - task: AzureCLI@2
+      displayName: 'Fd deploy'      
+      inputs:
+        azureSubscription: $(subscription)
+        scriptType: bash
+        scriptLocation: 'inlineScript'
+        inlineScript: './deploy.sh'
+        workingDirectory: 'fd'
   - job: 'DeployAppGw'
     displayName: 'Deploy Application gateway'
     dependsOn: 'DeployVnet'
