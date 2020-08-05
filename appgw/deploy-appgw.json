@@ -311,7 +311,7 @@
         {
             "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
             "apiVersion": "2019-11-01",
-            "name": "[concat(parameters('applicationGatewayName'),'-policy')]",
+            "name": "[concat(parameters('applicationGatewayName'),'policy')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "customRules": [
