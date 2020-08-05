@@ -10,6 +10,9 @@
         },
         "publicIpPrefix": {
             "value": "jjdevv2network-pip"
+        },
+        "bastionName": {
+            "value": "jjdevv2bastion"
         }
     }
 }

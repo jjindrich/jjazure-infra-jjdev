@@ -1,3 +1,4 @@
 rg='JJDevV2-Infra'
 
-# nothing to remove now
+# delete bastion
+az resource delete -g $rg -n jjdevv2bastion --resource-type "Microsoft.Network/bastionHosts"

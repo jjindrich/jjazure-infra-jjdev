@@ -65,3 +65,15 @@ stages:
           scriptLocation: 'inlineScript'
           inlineScript: './delete.sh'
           workingDirectory: 'apimngmt' 
+    - job: 'DestroyVnet'
+      displayName: 'Destroy Virtual network'
+      steps:
+      - script: chmod +x vnet/*.sh
+      - task: AzureCLI@2
+        displayName: 'Virtual network destroy'      
+        inputs:
+          azureSubscription: $(subscription)
+          scriptType: bash
+          scriptLocation: 'inlineScript'
+          inlineScript: './delete.sh'
+          workingDirectory: 'vnet'           
