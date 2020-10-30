@@ -14,6 +14,15 @@
         "virtualMachine4Z3Name": {
             "value": "jjdevv2vmzones4z3"
         },
+        "ppg1Name": {
+            "value": "jjdevv2vmppg1"
+        },
+        "virtualMachine5Z1Name": {
+            "value": "jjdevv2vmzones5z1"
+        },
+        "virtualMachine6Z1Name": {
+            "value": "jjdevv2vmzones6z1"
+        },
         "adminUsername": {
             "value": "jj"
         },
