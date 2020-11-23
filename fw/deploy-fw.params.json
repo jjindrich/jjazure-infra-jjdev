@@ -31,6 +31,9 @@
         },
         "routeTablesNameSpokeApp": {
             "value": "jjdevv2fw-spokeapp-rt"
+        },
+        "firewallPolicyName": {
+            "value": "jjdevv2fw-policy"
         }
     }
 }

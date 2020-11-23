@@ -42,6 +42,9 @@
         },
         "routeTablesNameSpokeApp": {
             "type": "String"
+        },
+        "firewallPolicyName": {
+            "type": "string"
         }
     },
     "variables": {
@@ -1277,6 +1280,65 @@
             },
             "tags": {
             }
+        },
+
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/firewallPolicies",
+            "name": "[parameters('firewallPolicyName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "properties": {
+                "threatIntelWhitelist": {
+                    "ipAddresses": []
+                }
+            },
+            "resources": [
+                {
+                    "apiVersion": "2020-05-01",
+                    "type": "ruleCollectionGroups",
+                    "name": "DefaultNetworkRuleCollectionGroup",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/firewallPolicies',parameters('firewallPolicyName'))]"
+                    ],
+                    "properties": {
+                        "priority": 200,
+                        "ruleCollections": [
+                            {
+                                "name": "management-rules",
+                                "priority": 500,
+                                "action": {
+                                    "type": "Allow"
+                                },
+                                "rules": [
+                                    {
+                                        "name": "icmp",
+                                        "ipProtocols": [
+                                            "ICMP"
+                                        ],
+                                        "destinationPorts": [
+                                            "*"
+                                        ],
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "ruleType": "NetworkRule",
+                                        "destinationIpGroups": [],
+                                        "destinationAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationFqdns": []
+                                    }
+                                ],
+                                "ruleCollectionType": "FirewallPolicyFilterRuleCollection"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "tags": {}
         }
     ]
 }

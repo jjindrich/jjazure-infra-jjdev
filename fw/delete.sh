@@ -9,3 +9,4 @@ az network vnet subnet update -g $rg -n AzureApplicationGatewaySubnet --vnet-nam
 az network vnet subnet update -g $rg -n DmzApiMngmt --vnet-name JJDevV2Network --remove routeTable
 
 az resource delete -g $rg -n jjdevv2fw --resource-type "Microsoft.Network/azureFirewalls"
+az resource delete -g $rg -n jjdevv2fw-policy --resource-type "Microsoft.Network/firewallPolicies"
