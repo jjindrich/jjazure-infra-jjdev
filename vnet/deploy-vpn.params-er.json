@@ -1,0 +1,45 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkName": {
+            "value": "JJDevV2Network"
+        },
+        "vpnGwName": {
+            "value": "jjdevv2vpngw"
+        },
+        "vpnGwSku":{
+            "value": "VpnGw1"
+        },
+        "vpnGwPublicIpName": {
+            "value": "jjdevv2vpngw-ip"
+        },
+        "vpnGwPublicIpSku": {
+            "value": "Basic"
+        },
+        "vpnGwPublicIpAllocation": {
+            "value": "Dynamic"
+        },       
+        "vpnGwLocalName": {
+            "value": "JJDevBR1"
+        },
+        "vpnGwLocalIp": {
+            "value": "194.213.40.56"
+        },
+        "vpnGwConnectionName": {
+            "value": "JJDevBR1"
+        },
+        "vpnGwConnectionKey": {
+            "value": "default-key"
+        },
+        "erGwDeploy":{
+            "value": true
+        },
+        "erGwName": {
+            "value": "jjdevv2ergw"
+        },
+        "erGwPublicIpName": {
+            "value": "jjdevv2ergw-ip"
+        }
+    }
+}

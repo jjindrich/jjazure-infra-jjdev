@@ -1,0 +1,224 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vpnGwName": {
+            "type": "String"
+        },
+        "vpnGwSku": {
+            "type": "String"
+        },
+        "vpnGwPublicIpName": {
+            "type": "String"
+        },
+        "vpnGwPublicIpSku": {
+            "type": "String"
+        },
+        "vpnGwPublicIpAllocation": {
+            "type": "String"
+        },
+        "vpnGwLocalName": {
+            "type": "string"
+        },
+        "vpnGwLocalIp": {
+            "type": "string"
+        },
+        "vpnGwConnectionName": {
+            "type": "string"
+        },
+        "vpnGwConnectionKey": {
+            "type": "string"
+        },
+        "virtualNetworkName": {
+            "type": "string"
+        },
+        "erGwDeploy": {
+            "type": "bool"
+        },
+        "erGwName": {
+            "type": "String"
+        },
+        "erGwPublicIpName": {
+            "type": "String"
+        }
+    },
+    "variables": {
+        "vpnGwPublicIpId": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('vpnGwPublicIpName'))]",
+        "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "erGwPublicIpId": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('erGwPublicIpName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('vpnGwPublicIpName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "sku": {
+                "name": "[parameters('vpnGwPublicIpSku')]"
+            },
+            "properties": {
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "[parameters('vpnGwPublicIpAllocation')]",
+                "idleTimeoutInMinutes": 4,
+                "ipTags": [
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('vpnGwName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', parameters('vpnGwPublicIpName'))]"
+            ],
+            "properties": {
+                "enablePrivateIpAddress": false,
+                "ipConfigurations": [
+                    {
+                        "name": "default",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[variables('vpnGwPublicIpId')]"
+                            },
+                            "subnet": {
+                                "id": "[concat(variables('vnetId'), '/subnets/GatewaySubnet')]"
+                            }
+                        }
+                    }
+                ],
+                "sku": {
+                    "name": "[parameters('vpnGwSku')]",
+                    "tier": "[parameters('vpnGwSku')]"
+                },
+                "gatewayType": "Vpn",
+                "vpnGatewayGeneration": "Generation1",
+                "vpnType": "RouteBased",
+                "enableBgp": false,
+                "activeActive": false,
+                "vpnClientConfiguration": {
+                    "vpnClientAddressPool": {
+                        "addressPrefixes": [
+                            "172.16.1.0/24"
+                        ]
+                    },
+                    "vpnClientProtocols": [
+                        "SSTP"
+                    ],
+                    "vpnClientRootCertificates": [
+                        {
+                            "name": "JindrichoviCA",
+                            "properties": {
+                                "publicCertData": "MIIDDjCCAfagAwIBAgIQIDDTYWlBFZFKR3I4Lww+2DANBgkqhkiG9w0BAQsFADAg MR4wHAYDVQQDExVKSU5EUklDSE9WSS1TRVJWRVItQ0EwIBcNMTMxMjA4MjE1NDMw WhgPMjA1MzExMzAyMTU0MzBaMCAxHjAcBgNVBAMTFUpJTkRSSUNIT1ZJLVNFUlZF Ui1DQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKfTwmBpbjJe6o0h civaP+YqnxrpdazeVbmjC6lh7J9g3UVzJtJSW5xjGCgUjnFDwhRQqlMU3NngH47Q n+v6783zRA42MYGDJI6wK4eLtrBZa80QD7qUqxlquBHcAP/0swPq2hjp6MUBE2G7 Wzy+YTG6/46vaLQm32TPknIMwTKdAIMQAT7+tLIzmI4Kb24XB+04s+FV8tp95a5t g7BVhZvH2efviVTFR3H0z0ssTncHqfB4jIQa3NGvOJCpASjnTqX/plVepioed9eN NWaUwLaG6975r3KJA6R5qEA79xG6BQ51Zc3WyIvXWKtXfe+kg2zCeNRe2qTd6eRv aX8YWP8CAwEAAaNCMEAwDgYDVR0PAQH/BAQDAgGGMA8GA1UdEwEB/wQFMAMBAf8w HQYDVR0OBBYEFDeOaGyEwhLipta3Ng1OB5juBSVoMA0GCSqGSIb3DQEBCwUAA4IB AQB4xXyqqCkXtn12nyYTgVTdI0ju15PM2YEk5o4ngE5+FaH8YlS/EyaUgmopsaH/ 9Ip4k3GvOZzpwxWETh8ZL4j7xvswgXgC2nYSJkE0baAU/vgoJRPZ8yXhwn8/X+sU YArpcEq1lNL+jAHaZm/EmHxO2dv7z8DJsZ073ID2Hzcxfgr8+KyJj6W00iNC4nl0 IDwh5nQU4PpM1El4uOsmFDvshrXWa07palEuBNNWLDefbBkwxsyvjBeGTSl2p84B tbcTBE9JL5v6w97o26yV3bsGPvTGNpK2YFUIv22Jy/Z5EFTBo0srmPH1DdplCF/a eUFDG8W9fbUrtbL79QGjsN5Q"
+                            }
+                        }
+                    ],
+                    "vpnClientRevokedCertificates": [],
+                    "radiusServers": [],
+                    "vpnClientIpsecPolicies": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/localNetworkGateways",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('vpnGwLocalName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "properties": {
+                "localNetworkAddressSpace": {
+                    "addressPrefixes": [
+                        "10.1.0.0/16"
+                    ]
+                },
+                "gatewayIpAddress": "[parameters('vpnGwLocalIp')]"
+            }
+        },
+        {
+            "type": "Microsoft.Network/connections",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('vpnGwConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('vpnGwName'))]",
+                "[resourceId('Microsoft.Network/localNetworkGateways', parameters('vpnGwLocalName'))]"
+            ],
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('vpnGwName'))]"
+                },
+                "localNetworkGateway2": {
+                    "id": "[resourceId('Microsoft.Network/localNetworkGateways', parameters('vpnGwLocalName'))]"
+                },
+                "connectionType": "IPsec",
+                "connectionProtocol": "IKEv2",
+                "routingWeight": 0,
+                "sharedKey": "[parameters('vpnGwConnectionKey')]",
+                "enableBgp": false,
+                "useLocalAzureIpAddress": false,
+                "usePolicyBasedTrafficSelectors": false,
+                "ipsecPolicies": [],
+                "trafficSelectorPolicies": [],
+                "expressRouteGatewayBypass": false,
+                "dpdTimeoutSeconds": 0
+            }
+        },
+
+        {
+            "condition": "[parameters('erGwDeploy')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2019-09-01",
+            "name": "[parameters('erGwPublicIpName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },
+            "properties": {
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4,
+                "ipTags": [
+                ]
+            }
+        },
+        {
+            "condition": "[parameters('erGwDeploy')]",
+            "apiVersion": "2019-04-01",
+            "name": "[parameters('erGwName')]",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', parameters('erGwPublicIpName'))]"
+            ],
+            "tags": {},
+            "properties": {
+                "gatewayType": "ExpressRoute",
+                "ipConfigurations": [
+                    {
+                        "name": "default",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[concat(variables('vnetId'), '/subnets/GatewaySubnet')]"
+                            },
+                            "publicIpAddress": {
+                                "id": "[variables('erGwPublicIpId')]"
+                            }
+                        }
+                    }
+                ],
+                "sku": {
+                    "name": "Standard",
+                    "tier": "Standard"
+                }
+            }
+        }
+    ]
+}
