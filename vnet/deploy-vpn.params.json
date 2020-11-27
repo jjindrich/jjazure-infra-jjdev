@@ -15,10 +15,10 @@
             "value": "jjdevv2vpngw-ip"
         },
         "vpnGwPublicIpSku": {
-            "value": "Standard"
+            "value": "Basic"
         },
         "vpnGwPublicIpAllocation": {
-            "value": "Static"
+            "value": "Dynamic"
         },         
         "vpnGwLocalName": {
             "value": "JJDevBR1"
