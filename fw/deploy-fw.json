@@ -150,8 +150,14 @@
                             "nextHopType": "VirtualAppliance",
                             "nextHopIpAddress": "[reference(parameters('azureFirewallName')).ipConfigurations[0].properties.privateIPAddress]"
                         }
+                    },
+                    {
+                        "name": "Subnet",
+                        "properties": {
+                            "addressPrefix": "10.3.0.0/24",
+                            "nextHopType": "VnetLocal"
+                        }
                     }
-
                 ]
             }
         },
