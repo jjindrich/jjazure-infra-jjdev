@@ -272,7 +272,7 @@
                     {
                         "name": "GatewaySubnet",
                         "properties": {
-                            "addressPrefix": "10.3.0.0/29",
+                            "addressPrefix": "10.3.0.0/27",
                             "serviceEndpoints": [
                             ],
                             "delegations": [
