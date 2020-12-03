@@ -476,6 +476,24 @@
                             },
                             "rules": [
                                 {
+                                    "name": "Ping",
+                                    "protocols": [
+                                        "ICMP"
+                                    ],
+                                    "sourceAddresses": [
+                                        "*"
+                                    ],
+                                    "destinationAddresses": [
+                                        "*"
+                                    ],
+                                    "sourceIpGroups": [],
+                                    "destinationIpGroups": [],
+                                    "destinationFqdns": [],
+                                    "destinationPorts": [
+                                        "*"
+                                    ]
+                                },
+                                {
                                     "name": "DNStoAD",
                                     "protocols": [
                                         "UDP"
