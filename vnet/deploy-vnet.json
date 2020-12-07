@@ -46,24 +46,20 @@
             "properties": {
                 "securityRules": [
                     {
-                        "name": "Rdp",
+                        "name": "RDP",
                         "properties": {
                             "protocol": "TCP",
                             "sourcePortRange": "*",
-                            "destinationPortRanges": [
-                                "3389"
-                            ],
-                            "sourceAddressPrefix": "Internet",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "95.85.255.10",
                             "destinationAddressPrefix": "VirtualNetwork",
                             "access": "Allow",
                             "priority": 300,
                             "direction": "Inbound",
-                            "sourcePortRanges": [
-                            ],
-                            "sourceAddressPrefixes": [
-                            ],
-                            "destinationAddressPrefixes": [
-                            ]
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
                         }
                     },
                     {
