@@ -41,10 +41,52 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-11-01",
-            "name": "[concat(parameters('vnetHubName'),'-Default')]",
+            "name": "[concat(parameters('vnetHubName'),'-DmzInfra')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "securityRules": [
+                    {
+                        "name": "Rdp",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRanges": [
+                                "3389"
+                            ],
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "VirtualNetwork",
+                            "access": "Allow",
+                            "priority": 300,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": [
+                            ]
+                        }
+                    },
+                    {
+                        "name": "AdminCenter-Preview",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRanges": [
+                                "6516"
+                            ],
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "VirtualNetwork",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": [
+                            ]
+                        }
+                    }
                 ]
             }
         },
@@ -286,7 +328,7 @@
                         "properties": {
                             "addressPrefix": "10.3.250.0/24",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetHubName'),'-Default'))]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetHubName'),'-DmzInfra'))]"
                             },
                             "serviceEndpoints": [
                             ],
@@ -571,7 +613,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('bastionName'),'-ip'))]"                                
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('bastionName'),'-ip'))]"
                             },
                             "subnet": {
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetHubName'), 'AzureBastionSubnet')]"
