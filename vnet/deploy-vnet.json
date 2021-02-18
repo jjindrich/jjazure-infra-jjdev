@@ -481,6 +481,21 @@
                             "delegations": [
                             ],
                             "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Disabled"
+                        }
+                    },
+                    {
+                        "name": "DmzAksPrivate",
+                        "properties": {
+                            "addressPrefix": "10.4.3.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetAppName'),'-Default'))]"
+                            },
+                            "serviceEndpoints": [
+                            ],
+                            "delegations": [
+                            ],
+                            "privateEndpointNetworkPolicies": "Disabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
                     },
@@ -498,6 +513,27 @@
                                     "name": "delegation",
                                     "properties": {
                                         "serviceName": "Microsoft.Web/serverfarms"
+                                    }
+                                }
+                            ],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "DmzAci",
+                        "properties": {
+                            "addressPrefix": "10.4.22.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetAppName'),'-Default'))]"
+                            },
+                            "serviceEndpoints": [
+                            ],
+                            "delegations": [
+                                {
+                                    "name": "Microsoft.ContainerInstance.containerGroups",
+                                    "properties": {
+                                        "serviceName": "Microsoft.ContainerInstance/containerGroups"
                                     }
                                 }
                             ],
