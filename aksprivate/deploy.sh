@@ -11,7 +11,7 @@ rgaks='jjmicroservices-rg'
 # User identity for AKS
 #az identity create --name jjaksprivate --resource-group $rgaks
 
-# Deploy AKS
+# Deploy AKS private (using Azure Firewall)
 az aks create -n jjaksprivate -g $rgaks \
     -x -c 2 -z 1 2 3 --node-resource-group 'jjmicroservices-aksprivate-rg' \
     --node-osdisk-type Standard_SSD --node-vm-size Standard_B2s \
@@ -20,7 +20,19 @@ az aks create -n jjaksprivate -g $rgaks \
     --vnet-subnet-id $(az network vnet subnet show --vnet-name JJDevV2NetworkApp -g $rg -n DmzAksPrivate --query id -o tsv) \
     --enable-private-cluster \
     --private-dns-zone $(az network private-dns zone show -g $rg -n privatelink.westeurope.azmk8s.io --query id -o tsv) \
-    --outbound-type userDefinedRouting \
     --enable-aad \
-    --enable-addons monitoring --workspace-resource-id $(az monitor log-analytics workspace show -g $rgmonitor -n jjdev-analytics --query id -o tsv)
+    --enable-addons monitoring \
+    --workspace-resource-id $(az monitor log-analytics workspace show -g $rgmonitor -n jjdev-analytics --query id -o tsv) \
+    --outbound-type userDefinedRouting
 
+# Deploy application using intenal loadbalancer
+#kubectl apply -f sample-private.yaml
+
+# Deploy AKS with AppGw ingress
+# First deploy AppGw appgw/deploy.sh
+#    --enable-addons ingress-appgw,monitoring \
+#    --workspace-resource-id $(az monitor log-analytics workspace show -g $rgmonitor -n jjdev-analytics --query id -o tsv) \
+#    --appgw-id $(az network application-gateway show -n jjdevv2appgw -g $rg --query id -o tsv)
+
+# Deploy application published by application gateway
+#kubectl apply -f sample-appgw.yaml
