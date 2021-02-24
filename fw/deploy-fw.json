@@ -285,14 +285,19 @@
             }
         },
         {
-            "apiVersion": "2019-04-01",
             "type": "Microsoft.Network/azureFirewalls",
+            "apiVersion": "2020-05-01",
             "name": "[parameters('azureFirewallName')]",
             "location": "[resourceGroup().location]",
             "zones": "[if(equals(length(parameters('availabilityZones')), 0), json('null'), parameters('availabilityZones'))]",
-            "dependsOn": [
-            ],
+            "dependsOn": [ "[resourceId('Microsoft.Network/firewallPolicies', parameters('firewallPolicyName'))]" ],
             "properties": {
+                "sku": {
+                    "name": "AZFW_VNet",
+                    "tier": "Standard"
+                },
+                "threatIntelMode": "Alert",
+                "additionalProperties": {},
                 "ipConfigurations": [
                     {
                         "name": "IpConf",
@@ -306,1007 +311,14 @@
                         }
                     }
                 ],
-                "networkRuleCollections": [
-                    {
-                        "name": "Console",
-                        "properties": {
-                            "priority": 1000,
-                            "action": {
-                                "type": "Allow"
-                            },
-                            "rules": [
-                                {
-                                    "name": "RDP",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "destinationAddresses": [
-                                        "10.3.0.0/16",
-                                        "10.4.0.0/16"
-                                    ],
-                                    "destinationPorts": [
-                                        "3389"
-                                    ]
-                                },
-                                {
-                                    "name": "SSH",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "destinationAddresses": [
-                                        "10.3.0.0/16",
-                                        "10.4.0.0/16"
-                                    ],
-                                    "destinationPorts": [
-                                        "22"
-                                    ]
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "Web",
-                        "properties": {
-                            "priority": 1001,
-                            "action": {
-                                "type": "Allow"
-                            },
-                            "rules": [
-                                {
-                                    "name": "HTTPtoApp",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "10.3.0.0/16"
-                                    ],
-                                    "destinationAddresses": [
-                                        "10.4.0.0/16"
-                                    ],
-                                    "destinationPorts": [
-                                        "80"
-                                    ]
-                                },
-                                {
-                                    "name": "HTTPtoJJDEVBR1",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "10.3.0.0/16",
-                                        "10.4.0.0/16"
-                                    ],
-                                    "destinationAddresses": [
-                                        "10.1.0.0/16"
-                                    ],
-                                    "destinationPorts": [
-                                        "80"
-                                    ]
-                                },
-                                {
-                                    "name": "HTTPAppGwtoADDC",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "10.3.253.0/24"
-                                    ],
-                                    "destinationAddresses": [
-                                        "10.3.250.0/24"
-                                    ],
-                                    "destinationPorts": [
-                                        "80"
-                                    ]
-                                },
-                                {
-                                    "name": "HTTPADDCtoAppGW",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "10.3.250.0/24"
-                                    ],
-                                    "destinationAddresses": [
-                                        "10.3.253.0/24"
-                                    ],
-                                    "destinationPorts": [
-                                        "80",
-                                        "8080"
-                                    ]
-                                },
-                                {
-                                    "name": "HTTPADDCtoApiMngmt",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "10.3.250.0/24"
-                                    ],
-                                    "destinationAddresses": [
-                                        "10.3.251.0/24"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ],
-                                    "destinationIpGroups": [
-                                    ],
-                                    "destinationFqdns": [
-                                    ],
-                                    "destinationPorts": [
-                                        "80",
-                                        "443"
-                                    ]
-                                },
-                                {
-                                    "name": "HTTPAppGwtoApiMngmt",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "10.3.253.0/24"
-                                    ],
-                                    "destinationAddresses": [
-                                        "10.3.251.0/24"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ],
-                                    "destinationIpGroups": [
-                                    ],
-                                    "destinationFqdns": [
-                                    ],
-                                    "destinationPorts": [
-                                        "80",
-                                        "443"
-                                    ]
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "CoreServices",
-                        "properties": {
-                            "priority": 1003,
-                            "action": {
-                                "type": "Allow"
-                            },
-                            "rules": [
-                                {
-                                    "name": "Ping",
-                                    "protocols": [
-                                        "ICMP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "destinationAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [],
-                                    "destinationIpGroups": [],
-                                    "destinationFqdns": [],
-                                    "destinationPorts": [
-                                        "*"
-                                    ]
-                                },
-                                {
-                                    "name": "DNStoAD",
-                                    "protocols": [
-                                        "UDP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "destinationAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ],
-                                    "destinationIpGroups": [
-                                    ],
-                                    "destinationFqdns": [
-                                    ],
-                                    "destinationPorts": [
-                                        "53"
-                                    ]
-                                },
-                                {
-                                    "name": "NTPLinux",
-                                    "protocols": [
-                                        "UDP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "destinationAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ],
-                                    "destinationIpGroups": [
-                                    ],
-                                    "destinationFqdns": [
-                                    ],
-                                    "destinationPorts": [
-                                        "123"
-                                    ]
-                                },
-                                {
-                                    "name": "LDAPtoAD, Kerberos",
-                                    "protocols": [
-                                        "TCP",
-                                        "UDP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "destinationAddresses": [
-                                        "10.3.250.10"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ],
-                                    "destinationIpGroups": [
-                                    ],
-                                    "destinationFqdns": [
-                                    ],
-                                    "destinationPorts": [
-                                        "389",
-                                        "88",
-                                        "135"
-                                    ]
-                                },
-                                {
-                                    "name": "DNSresponse",
-                                    "protocols": [
-                                        "UDP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "10.3.250.10"
-                                    ],
-                                    "destinationAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [],
-                                    "destinationIpGroups": [],
-                                    "destinationFqdns": [],
-                                    "destinationPorts": [
-                                        "*"
-                                    ]
-                                },
-                                {
-                                    "name": "AAD",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "destinationAddresses": [
-                                        "AzureActiveDirectory"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ],
-                                    "destinationIpGroups": [
-                                    ],
-                                    "destinationFqdns": [
-                                    ],
-                                    "destinationPorts": [
-                                        "443"
-                                    ]
-                                },
-                                {
-                                    "name": "AzureGlobalKMS",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "destinationAddresses": [
-                                        "23.102.135.246"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ],
-                                    "destinationIpGroups": [
-                                    ],
-                                    "destinationFqdns": [
-                                    ],
-                                    "destinationPorts": [
-                                        "1688"
-                                    ]
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "AKS",
-                        "properties": {
-                            "priority": 1005,
-                            "action": {
-                                "type": "Allow"
-                            },
-                            "rules": [
-                                {
-                                    "name": "AksInternal",
-                                    "protocols": [
-                                        "UDP",
-                                        "TCP"
-                                    ],
-                                    "sourceAddresses": [
-                                        "10.4.2.0/24"
-                                    ],
-                                    "destinationAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ],
-                                    "destinationIpGroups": [
-                                    ],
-                                    "destinationFqdns": [
-                                    ],
-                                    "destinationPorts": [
-                                        "9000",
-                                        "1194"
-                                    ]
-                                }
-                            ]
-                        }
-                    }
-                ],
-                "applicationRuleCollections": [
-                    {
-                        "name": "Updates",
-                        "properties": {
-                            "priority": 1000,
-                            "action": {
-                                "type": "Allow"
-                            },
-                            "rules": [
-                                {
-                                    "name": "Windows Update",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Http",
-                                            "port": 80
-                                        },
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                        "WindowsUpdate"
-                                    ],
-                                    "targetFqdns": [
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ]
-                                },
-                                {
-                                    "name": "LinuxUpdates",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Http",
-                                            "port": 80
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "security.ubuntu.com",
-                                        "azure.archive.ubuntu.com",
-                                        "changelogs.ubuntu.com"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ]
-                                },
-                                {
-                                    "name": "MsPackages",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "packages.microsoft.com"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ]
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "CoreServices",
-                        "properties": {
-                            "priority": 1020,
-                            "action": {
-                                "type": "Allow"
-                            },
-                            "rules": [
-                                {
-                                    "name": "Monitoring",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "*.ods.opinsights.azure.com",
-                                        "*.oms.opinsights.azure.com",
-                                        "*.monitoring.azure.com"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "ADsync",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "*.servicebus.windows.net"
-                                    ],
-                                    "sourceAddresses": [
-                                        "10.3.250.10"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "Automation",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "*.azure-automation.net"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "SiteRecovery",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "*.servicebus.windows.net"
-                                    ],
-                                    "sourceAddresses": [
-                                        "10.4.1.4"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "ATP",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "winatp-gw-neu.microsoft.com"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "Core",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Http",
-                                            "port": 80
-                                        },
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                        "WindowsDiagnostics",
-                                        "AzureBackup",
-                                        "MicrosoftActiveProtectionService"
-                                    ],
-                                    "targetFqdns": [
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "MonitorQualys",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "*.apps.qualys.eu"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "AKS",
-                        "properties": {
-                            "priority": 1030,
-                            "action": {
-                                "type": "Allow"
-                            },
-                            "rules": [
-                                {
-                                    "name": "api",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "*.hcp.westeurope.azmk8s.io"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "repo",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "aksrepos.azurecr.io",
-                                        "quay.io",
-                                        "*.quay.io"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "packages",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "packages.microsoft.com",
-                                        "api.snapcraft.io",
-                                        "motd.ubuntu.com"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "api endpoint",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "*.tun.westeurope.azmk8s.io"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "storage",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "*.blob.core.windows.net"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "mcr",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "mcr.microsoft.com",
-                                        "*.mcr.microsoft.com"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "cdn",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "*.cdn.mscr.io"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "management",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "management.azure.com"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "login",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "login.microsoftonline.com"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "acs-mirror.azureedge.net",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "acs-mirror.azureedge.net"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "devops",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [],
-                                    "targetFqdns": [
-                                        "*.services.visualstudio.com"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": []
-                                },
-                                {
-                                    "name": "monitoring",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [],
-                                    "targetFqdns": [
-                                        "*.westeurope.monitoring.azure.com"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": []
-                                },
-                                {
-                                    "name": "events",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [],
-                                    "targetFqdns": [
-                                        "*.events.data.microsoft.com"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": []
-                                },
-                                {
-                                    "name": "gcp",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [],
-                                    "targetFqdns": [
-                                        "k8s.gcr.io",
-                                        "storage.googleapis.com"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": []
-                                },
-                                {
-                                    "name": "jjappconfig",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "jjaksconfig.azconfig.io"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "jjrepo",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "jjakscontainers.azurecr.io"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                },
-                                {
-                                    "name": "AKSservice",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Http",
-                                            "port": 80
-                                        },
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                        "AzureKubernetesService"
-                                    ],
-                                    "targetFqdns": [],
-                                    "sourceAddresses": [
-                                        "10.4.2.0/24"
-                                    ],
-                                    "sourceIpGroups": []
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "AppService",
-                        "properties": {
-                            "priority": 1040,
-                            "action": {
-                                "type": "Allow"
-                            },
-                            "rules": [
-                                {
-                                    "name": "AppService",
-                                    "protocols": [
-                                        {
-                                            "protocolType": "Https",
-                                            "port": 443
-                                        }
-                                    ],
-                                    "fqdnTags": [
-                                    ],
-                                    "targetFqdns": [
-                                        "azurewatsonanalysis-prod.core.windows.net"
-                                    ],
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "sourceIpGroups": [
-                                    ]
-                                }
-                            ]
-                        }
-                    }
-                ],
-                "natRuleCollections": [
-                    {
-                        "name": "RdpServer",
-                        "properties": {
-                            "priority": 1001,
-                            "action": {
-                                "type": "Dnat"
-                            },
-                            "rules": [
-                                {
-                                    "name": "Rdp-jjdevv2addc",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "translatedAddress": "10.3.250.10",
-                                    "translatedPort": "3389",
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "destinationAddresses": [
-                                        "[reference(parameters('publicIpAddress')).ipAddress]"
-                                    ],
-                                    "destinationPorts": [
-                                        "3389"
-                                    ]
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "Http",
-                        "properties": {
-                            "priority": 1000,
-                            "action": {
-                                "type": "Dnat"
-                            },
-                            "rules": [
-                                {
-                                    "name": "HttpAppGw",
-                                    "protocols": [
-                                        "TCP"
-                                    ],
-                                    "translatedAddress": "10.3.250.10",
-                                    "translatedPort": "80",
-                                    "sourceAddresses": [
-                                        "*"
-                                    ],
-                                    "destinationAddresses": [
-                                        "[reference(parameters('publicIpAddress')).ipAddress]"
-                                    ],
-                                    "destinationPorts": [
-                                        "80"
-                                    ]
-                                }
-                            ]
-                        }
-                    }
-
-                ]
-            },
-            "tags": {
+                "networkRuleCollections": [],
+                "applicationRuleCollections": [],
+                "natRuleCollections": [],
+                "firewallPolicy": {
+                    "id": "[resourceId('Microsoft.Network/firewallPolicies',parameters('firewallPolicyName'))]"
+                }
             }
         },
-
         {
             "apiVersion": "2020-05-01",
             "type": "Microsoft.Network/firewallPolicies",
@@ -1314,11 +326,87 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [],
             "properties": {
+                "sku": {
+                    "tier": "Standard"
+                },
                 "threatIntelWhitelist": {
+                    "fqdns": [],
                     "ipAddresses": []
                 }
             },
             "resources": [
+                {
+                    "apiVersion": "2020-05-01",
+                    "type": "ruleCollectionGroups",
+                    "name": "DefaultDnatRuleCollectionGroup",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/firewallPolicies',parameters('firewallPolicyName'))]"
+                    ],
+                    "properties": {
+                        "priority": 100,
+                        "ruleCollections": [
+                            {
+                                "ruleCollectionType": "FirewallPolicyNatRuleCollection",
+                                "action": {
+                                    "type": "Dnat"
+                                },
+                                "rules": [
+                                    {
+                                        "ruleType": "NatRule",
+                                        "name": "Rdp-jjdevv2addc",
+                                        "translatedAddress": "10.3.250.10",
+                                        "translatedPort": "3389",
+                                        "ipProtocols": [
+                                            "TCP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "[reference(parameters('publicIpAddress')).ipAddress]"
+                                        ],
+                                        "destinationPorts": [
+                                            "3389"
+                                        ]
+                                    }
+                                ],
+                                "name": "RdpServer",
+                                "priority": 1001
+                            },
+                            {
+                                "ruleCollectionType": "FirewallPolicyNatRuleCollection",
+                                "action": {
+                                    "type": "Dnat"
+                                },
+                                "rules": [
+                                    {
+                                        "ruleType": "NatRule",
+                                        "name": "HttpAppGw",
+                                        "translatedAddress": "10.3.250.10",
+                                        "translatedPort": "80",
+                                        "ipProtocols": [
+                                            "TCP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "[reference(parameters('publicIpAddress')).ipAddress]"
+                                        ],
+                                        "destinationPorts": [
+                                            "80"
+                                        ]
+                                    }
+                                ],
+                                "name": "Http",
+                                "priority": 1000
+                            }
+                        ]
+                    }
+                },
                 {
                     "apiVersion": "2020-05-01",
                     "type": "ruleCollectionGroups",
@@ -1331,33 +419,1025 @@
                         "priority": 200,
                         "ruleCollections": [
                             {
-                                "name": "management-rules",
-                                "priority": 500,
+                                "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
                                 "action": {
                                     "type": "Allow"
                                 },
                                 "rules": [
                                     {
-                                        "name": "icmp",
+                                        "ruleType": "NetworkRule",
+                                        "name": "RDP",
                                         "ipProtocols": [
-                                            "ICMP"
-                                        ],
-                                        "destinationPorts": [
-                                            "*"
+                                            "TCP"
                                         ],
                                         "sourceAddresses": [
                                             "*"
                                         ],
                                         "sourceIpGroups": [],
-                                        "ruleType": "NetworkRule",
+                                        "destinationAddresses": [
+                                            "10.3.0.0/16",
+                                            "10.4.0.0/16"
+                                        ],
                                         "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "3389"
+                                        ]
+                                    },
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "SSH",
+                                        "ipProtocols": [
+                                            "TCP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "10.3.0.0/16",
+                                            "10.4.0.0/16"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "22"
+                                        ]
+                                    }
+                                ],
+                                "name": "Console",
+                                "priority": 1000
+                            },
+                            {
+                                "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+                                "action": {
+                                    "type": "Allow"
+                                },
+                                "rules": [
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "HTTPtoApp",
+                                        "ipProtocols": [
+                                            "TCP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "10.3.0.0/16"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "10.4.0.0/16"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "80"
+                                        ]
+                                    },
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "HTTPtoJJDEVBR1",
+                                        "ipProtocols": [
+                                            "TCP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "10.3.0.0/16",
+                                            "10.4.0.0/16"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "10.1.0.0/16"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "80"
+                                        ]
+                                    },
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "HTTPAppGwtoADDC",
+                                        "ipProtocols": [
+                                            "TCP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "10.3.253.0/24"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "10.3.250.0/24"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "80"
+                                        ]
+                                    },
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "HTTPADDCtoAppGW",
+                                        "ipProtocols": [
+                                            "TCP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "10.3.250.0/24"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "10.3.253.0/24"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "80",
+                                            "8080"
+                                        ]
+                                    },
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "HTTPADDCtoApiMngmt",
+                                        "ipProtocols": [
+                                            "TCP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "10.3.250.0/24"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "10.3.251.0/24"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "80",
+                                            "443"
+                                        ]
+                                    },
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "HTTPAppGwtoApiMngmt",
+                                        "ipProtocols": [
+                                            "TCP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "10.3.253.0/24"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "10.3.251.0/24"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "80",
+                                            "443"
+                                        ]
+                                    }
+                                ],
+                                "name": "Web",
+                                "priority": 1001
+                            },
+                            {
+                                "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+                                "action": {
+                                    "type": "Allow"
+                                },
+                                "rules": [
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "Ping",
+                                        "ipProtocols": [
+                                            "ICMP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "sourceIpGroups": [],
                                         "destinationAddresses": [
                                             "*"
                                         ],
-                                        "destinationFqdns": []
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "*"
+                                        ]
+                                    },
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "DNStoAD",
+                                        "ipProtocols": [
+                                            "UDP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "53"
+                                        ]
+                                    },
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "NTPLinux",
+                                        "ipProtocols": [
+                                            "UDP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "123"
+                                        ]
+                                    },
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "LDAPtoAD, Kerberos",
+                                        "ipProtocols": [
+                                            "TCP",
+                                            "UDP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "10.3.250.10"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "389",
+                                            "88",
+                                            "135"
+                                        ]
+                                    },
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "DNSresponse",
+                                        "ipProtocols": [
+                                            "UDP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "10.3.250.10"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "*"
+                                        ]
+                                    },
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "AAD",
+                                        "ipProtocols": [
+                                            "TCP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "AzureActiveDirectory"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "443"
+                                        ]
+                                    },
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "AzureGlobalKMS",
+                                        "ipProtocols": [
+                                            "TCP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "23.102.135.246"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "1688"
+                                        ]
                                     }
                                 ],
-                                "ruleCollectionType": "FirewallPolicyFilterRuleCollection"
+                                "name": "CoreServices",
+                                "priority": 1003
+                            },
+                            {
+                                "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+                                "action": {
+                                    "type": "Allow"
+                                },
+                                "rules": [
+                                    {
+                                        "ruleType": "NetworkRule",
+                                        "name": "AksInternal",
+                                        "ipProtocols": [
+                                            "UDP",
+                                            "TCP"
+                                        ],
+                                        "sourceAddresses": [
+                                            "10.4.2.0/24"
+                                        ],
+                                        "sourceIpGroups": [],
+                                        "destinationAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationIpGroups": [],
+                                        "destinationFqdns": [],
+                                        "destinationPorts": [
+                                            "9000",
+                                            "1194"
+                                        ]
+                                    }
+                                ],
+                                "name": "AKS",
+                                "priority": 1005
+                            }
+                        ]
+                    }
+                },
+                {
+                    "apiVersion": "2020-05-01",
+                    "type": "ruleCollectionGroups",
+                    "name": "DefaultApplicationRuleCollectionGroup",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/firewallPolicies',parameters('firewallPolicyName'))]"
+                    ],
+                    "properties": {
+                        "priority": 300,
+                        "ruleCollections": [
+                            {
+                                "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+                                "action": {
+                                    "type": "Allow"
+                                },
+                                "rules": [
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "Windows Update",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Http",
+                                                "port": 80
+                                            },
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [
+                                            "WindowsUpdate"
+                                        ],
+                                        "targetFqdns": [],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "LinuxUpdates",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Http",
+                                                "port": 80
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "security.ubuntu.com",
+                                            "azure.archive.ubuntu.com",
+                                            "changelogs.ubuntu.com"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "MsPackages",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "packages.microsoft.com"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    }
+                                ],
+                                "name": "Updates",
+                                "priority": 1000
+                            },
+                            {
+                                "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+                                "action": {
+                                    "type": "Allow"
+                                },
+                                "rules": [
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "Monitoring",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "*.ods.opinsights.azure.com",
+                                            "*.oms.opinsights.azure.com",
+                                            "*.monitoring.azure.com"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "ADsync",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "*.servicebus.windows.net"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "10.3.250.10"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "Automation",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "*.azure-automation.net"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "SiteRecovery",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "*.servicebus.windows.net"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "10.4.1.4"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "ATP",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "winatp-gw-neu.microsoft.com"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "Core",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Http",
+                                                "port": 80
+                                            },
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [
+                                            "WindowsDiagnostics",
+                                            "AzureBackup",
+                                            "MicrosoftActiveProtectionService"
+                                        ],
+                                        "targetFqdns": [],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "MonitorQualys",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "*.apps.qualys.eu"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    }
+                                ],
+                                "name": "CoreServices",
+                                "priority": 1020
+                            },
+                            {
+                                "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+                                "action": {
+                                    "type": "Allow"
+                                },
+                                "rules": [
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "api",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "*.hcp.westeurope.azmk8s.io"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "repo",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "aksrepos.azurecr.io",
+                                            "quay.io",
+                                            "*.quay.io"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "packages",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "packages.microsoft.com",
+                                            "api.snapcraft.io",
+                                            "motd.ubuntu.com"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "api endpoint",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "*.tun.westeurope.azmk8s.io"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "storage",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "*.blob.core.windows.net"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "mcr",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "mcr.microsoft.com",
+                                            "*.mcr.microsoft.com"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "cdn",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "*.cdn.mscr.io"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "management",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "management.azure.com"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "login",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "login.microsoftonline.com"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "acs-mirror.azureedge.net",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "acs-mirror.azureedge.net"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "devops",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "*.services.visualstudio.com"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "monitoring",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "*.westeurope.monitoring.azure.com"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "events",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "*.events.data.microsoft.com"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "gcp",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "k8s.gcr.io",
+                                            "storage.googleapis.com"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "jjappconfig",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "jjaksconfig.azconfig.io"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "jjrepo",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "jjakscontainers.azurecr.io"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    },
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "AKSservice",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Http",
+                                                "port": 80
+                                            },
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [
+                                            "AzureKubernetesService"
+                                        ],
+                                        "targetFqdns": [],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "10.4.2.0/24"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    }
+                                ],
+                                "name": "AKS",
+                                "priority": 1030
+                            },
+                            {
+                                "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+                                "action": {
+                                    "type": "Allow"
+                                },
+                                "rules": [
+                                    {
+                                        "ruleType": "ApplicationRule",
+                                        "name": "AppService",
+                                        "protocols": [
+                                            {
+                                                "protocolType": "Https",
+                                                "port": 443
+                                            }
+                                        ],
+                                        "fqdnTags": [],
+                                        "targetFqdns": [
+                                            "azurewatsonanalysis-prod.core.windows.net"
+                                        ],
+                                        "targetUrls": [],
+                                        "terminateTLS": false,
+                                        "sourceAddresses": [
+                                            "*"
+                                        ],
+                                        "destinationAddresses": [],
+                                        "sourceIpGroups": []
+                                    }
+                                ],
+                                "name": "AppService",
+                                "priority": 1040
                             }
                         ]
                     }

@@ -5,6 +5,9 @@
         "azureFirewallName": {
             "value": "jjdevv2fw"
         },
+        "firewallPolicyName": {
+            "value": "jjdevv2fwpolicy"
+        },
         "virtualNetworkName": {
             "value": "JJDevV2Network"
         },
@@ -31,9 +34,6 @@
         },
         "routeTablesNameSpokeApp": {
             "value": "jjdevv2fw-spokeapp-rt"
-        },
-        "firewallPolicyName": {
-            "value": "jjdevv2fw-policy"
         }
     }
 }
