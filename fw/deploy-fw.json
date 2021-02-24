@@ -384,7 +384,7 @@
                                     {
                                         "ruleType": "NatRule",
                                         "name": "HttpAppGw",
-                                        "translatedAddress": "10.3.250.10",
+                                        "translatedAddress": "10.3.253.10",
                                         "translatedPort": "80",
                                         "ipProtocols": [
                                             "TCP"
