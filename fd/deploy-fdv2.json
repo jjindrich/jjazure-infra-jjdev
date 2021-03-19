@@ -3,51 +3,47 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "profileName": {
-            "type": "string"
+            "type": "String"
         },
         "endpointName": {
-            "type": "string"
+            "type": "String"
         },
         "wafPolicyName": {
-            "type": "string"
+            "type": "String"
         }
     },
-    "variables": {
-    },
+    "variables": {},
     "resources": [
         {
+            "type": "Microsoft.Cdn/profiles",
             "apiVersion": "2020-09-01",
             "name": "[parameters('profileName')]",
-            "type": "Microsoft.Cdn/Profiles",
             "location": "Global",
-            "properties": {},
             "sku": {
                 "name": "Standard_AzureFrontDoor"
-            }
+            },
+            "kind": "frontdoor",
+            "properties": {}
         },
         {
+            "type": "Microsoft.Cdn/profiles/afdEndpoints",
             "apiVersion": "2020-09-01",
             "name": "[concat(parameters('profileName'),'/',parameters('endpointName'))]",
-            "type": "Microsoft.Cdn/Profiles/AfdEndpoints",
-            "dependsOn": [
-                "[concat('Microsoft.Cdn/Profiles/', parameters('profileName'))]"
-            ],
             "location": "Global",
+            "dependsOn": [
+                "[concat('Microsoft.Cdn/profiles/', parameters('profileName'))]"
+            ],
             "properties": {
-                "hostName": "[concat(parameters('endpointName'),'.z01.azurefd.net')]",
-                "originResponseTimeoutSeconds": 60,
-                "enabledState": "Enabled",
-                "deploymentStatus": null
+                "originResponseTimeoutSeconds": 60
             }
         },
-        // Origin groups
         {
             "type": "Microsoft.Cdn/profiles/originGroups",
             "apiVersion": "2020-09-01",
             "name": "[concat(parameters('profileName'), '/cdn-images')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Cdn/profiles', parameters('profileName'))]",
-                "[resourceId('Microsoft.Cdn/Profiles/AfdEndpoints',parameters('profileName'),parameters('endpointName'))]"
+                "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', parameters('profileName'), parameters('endpointName'))]"
             ],
             "properties": {
                 "loadBalancingSettings": {
@@ -58,7 +54,7 @@
                 "healthProbeSettings": {
                     "probePath": "/images/probe.txt",
                     "probeRequestType": "GET",
-                    "probeProtocol": "Http",
+                    "probeProtocol": "Https",
                     "probeIntervalInSeconds": 100
                 },
                 "sessionAffinityState": "Disabled"
@@ -70,7 +66,7 @@
             "name": "[concat(parameters('profileName'), '/jjaks')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Cdn/profiles', parameters('profileName'))]",
-                                "[resourceId('Microsoft.Cdn/Profiles/AfdEndpoints',parameters('profileName'),parameters('endpointName'))]"
+                "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', parameters('profileName'), parameters('endpointName'))]"
             ],
             "properties": {
                 "loadBalancingSettings": {
@@ -87,7 +83,6 @@
                 "sessionAffinityState": "Disabled"
             }
         },
-        // Origins
         {
             "type": "Microsoft.Cdn/profiles/originGroups/origins",
             "apiVersion": "2020-09-01",
@@ -102,8 +97,7 @@
                 "httpsPort": 443,
                 "originHostHeader": "jjdevv2cdnstorage.blob.core.windows.net",
                 "priority": 1,
-                "weight": 1000,
-                "enabledState": "Enabled"
+                "weight": 1000
             }
         },
         {
@@ -120,17 +114,15 @@
                 "httpsPort": 443,
                 "originHostHeader": "jjaks.westeurope.cloudapp.azure.com",
                 "priority": 1,
-                "weight": 1000,
-                "enabledState": "Enabled"
+                "weight": 1000
             }
         },
-        // Routes
         {
             "type": "Microsoft.Cdn/profiles/afdEndpoints/routes",
             "apiVersion": "2020-09-01",
-            "name": "[concat(parameters('profileName'), '/jjfdv2/images')]",
+            "name": "[concat(parameters('profileName'), '/', parameters('endpointName'), '/images')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', parameters('profileName'), 'jjfdv2')]",
+                "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', parameters('profileName'), parameters('endpointName'))]",
                 "[resourceId('Microsoft.Cdn/profiles', parameters('profileName'))]",
                 "[resourceId('Microsoft.Cdn/profiles/originGroups', parameters('profileName'), 'cdn-images')]",
                 "[resourceId('Microsoft.Cdn/profiles/originGroups/origins',parameters('profileName'), 'cdn-images', 'cdn-images-storage')]"
@@ -152,19 +144,18 @@
                 "queryStringCachingBehavior": "UseQueryString",
                 "forwardingProtocol": "MatchRequest",
                 "linkToDefaultDomain": "Enabled",
-                "httpsRedirect": "Enabled",
-                "enabledState": "Enabled"
+                "httpsRedirect": "Enabled"
             }
         },
         {
             "type": "Microsoft.Cdn/profiles/afdEndpoints/routes",
             "apiVersion": "2020-09-01",
-            "name": "[concat(parameters('profileName'), '/jjfdv2/root')]",
+            "name": "[concat(parameters('profileName'), '/', parameters('endpointName'), '/root')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', parameters('profileName'), 'jjfdv2')]",
+                "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', parameters('profileName'), parameters('endpointName'))]",
                 "[resourceId('Microsoft.Cdn/profiles', parameters('profileName'))]",
                 "[resourceId('Microsoft.Cdn/profiles/originGroups', parameters('profileName'), 'jjaks')]",
-                "[resourceId('Microsoft.Cdn/profiles/originGroups/origins',parameters('profileName'), 'jjaks', 'jjaks-cluster')]"
+                "[resourceId('Microsoft.Cdn/profiles/originGroups/origins', parameters('profileName'), 'jjaks', 'jjaks-cluster')]"
             ],
             "properties": {
                 "customDomains": [],
@@ -180,25 +171,22 @@
                     "/*"
                 ],
                 "compressionSettings": {},
-                "queryStringCachingBehavior": "NotSet",
-                "forwardingProtocol": "MatchRequest",
+                "queryStringCachingBehavior": "UseQueryString",
+                "forwardingProtocol": "HttpOnly",
                 "linkToDefaultDomain": "Enabled",
-                "httpsRedirect": "Enabled",
-                "enabledState": "Enabled"
+                "httpsRedirect": "Enabled"
             }
         },
-        // Security - WAF
         {
-            "apiVersion": "2020-09-01",
             "type": "Microsoft.Cdn/Profiles/SecurityPolicies",
+            "apiVersion": "2020-09-01",
             "name": "[concat(parameters('profileName'),'/',parameters('wafPolicyName'))]",
             "dependsOn": [
-                "[concat('Microsoft.Cdn/Profiles/', parameters('profileName'))]",
-                "[concat('Microsoft.Cdn/Profiles/', parameters('profileName'), '/afdEndpoints/', parameters('endpointName'))]"
+                "[resourceId('Microsoft.Cdn/Profiles/', parameters('profileName'))]",
+                "[resourceId('Microsoft.Cdn/Profiles/afdEndpoints', parameters('profileName'), parameters('endpointName'))]"
             ],
             "properties": {
                 "parameters": {
-                    "type": "WebApplicationFirewall",
                     "wafPolicy": {
                         "id": "[resourceId('Microsoft.Network/frontdoorwebapplicationfirewallpolicies',parameters('wafPolicyName'))]"
                     },
@@ -206,14 +194,15 @@
                         {
                             "domains": [
                                 {
-                                    "id": "[resourceId('Microsoft.Cdn/Profiles/AfdEndpoints', split(format('{0}/{1}', parameters('profileName'), parameters('endpointName')), '/')[0], split(format('{0}/{1}', parameters('profileName'), parameters('endpointName')), '/')[1])]"
+                                    "id": "[resourceId('Microsoft.Cdn/Profiles/afdEndpoints', parameters('profileName'), parameters('endpointName'))]"
                                 }
                             ],
                             "patternsToMatch": [
                                 "/*"
                             ]
                         }
-                    ]
+                    ],
+                    "type": "WebApplicationFirewall"
                 }
             }
         }
