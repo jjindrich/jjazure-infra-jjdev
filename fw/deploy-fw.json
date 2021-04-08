@@ -413,7 +413,8 @@
                     "name": "DefaultNetworkRuleCollectionGroup",
                     "location": "[resourceGroup().location]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/firewallPolicies',parameters('firewallPolicyName'))]"
+                        "[resourceId('Microsoft.Network/firewallPolicies',parameters('firewallPolicyName'))]",
+                        "[resourceId('Microsoft.Network/firewallPolicies/ruleCollectionGroups', parameters('firewallPolicyName'), 'DefaultDnatRuleCollectionGroup')]"
                     ],
                     "properties": {
                         "priority": 200,
@@ -782,7 +783,9 @@
                     "name": "DefaultApplicationRuleCollectionGroup",
                     "location": "[resourceGroup().location]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/firewallPolicies',parameters('firewallPolicyName'))]"
+                        "[resourceId('Microsoft.Network/firewallPolicies',parameters('firewallPolicyName'))]",
+                        "[resourceId('Microsoft.Network/firewallPolicies/ruleCollectionGroups', parameters('firewallPolicyName'), 'DefaultDnatRuleCollectionGroup')]",
+                        "[resourceId('Microsoft.Network/firewallPolicies/ruleCollectionGroups', parameters('firewallPolicyName'), 'DefaultNetworkRuleCollectionGroup')]"
                     ],
                     "properties": {
                         "priority": 300,
