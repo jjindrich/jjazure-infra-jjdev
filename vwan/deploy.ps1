@@ -2,7 +2,7 @@ $rg = "jjvwan-rg"
 az group create -n $rg -l westeurope
 
 # nasazeni pres Biceps
-az deployment group create --resource-group $rg --template-file deploy.bicep --parameters vwanName=jjvwan
+az deployment group create --resource-group $rg --template-file deploy.bicep --parameters password=Azure-1234512345
 
 # virtual wan resource
 #az network vwan create -g $rg -n jjvwan
