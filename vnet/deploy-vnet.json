@@ -390,6 +390,21 @@
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
+                    },
+                    {
+                        "name": "DmzImages",
+                        "properties": {
+                            "addressPrefix": "10.3.249.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetHubName'),'-DmzInfra'))]"
+                            },
+                            "serviceEndpoints": [
+                            ],
+                            "delegations": [
+                            ],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Disabled"
+                        }
                     }
                 ],
                 "enableDdosProtection": false,
