@@ -515,6 +515,26 @@
                         }
                     },
                     {
+                        "name": "DmzAse",
+                        "properties": {
+                            "addressPrefix": "10.4.4.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetAppName'),'-Default'))]"
+                            },
+                            "serviceEndpoints": [],
+                            "delegations": [
+                                {
+                                    "name": "Microsoft.Web.hostingEnvironments",
+                                    "properties": {
+                                        "serviceName": "Microsoft.Web/hostingEnvironments"
+                                    }
+                                }
+                            ],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
                         "name": "DmzFunction",
                         "properties": {
                             "addressPrefix": "10.4.21.0/24",
@@ -567,7 +587,7 @@
                             ],
                             "delegations": [
                             ],
-                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateEndpointNetworkPolicies": "Disabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
                     }

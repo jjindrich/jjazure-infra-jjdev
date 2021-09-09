@@ -6,6 +6,7 @@ az network vnet subnet update -g $rg -n DmzAks --vnet-name JJDevV2NetworkApp --r
 az network vnet subnet update -g $rg -n DmzAksPrivate --vnet-name JJDevV2NetworkApp --remove routeTable
 az network vnet subnet update -g $rg -n DmzApp --vnet-name JJDevV2NetworkApp --remove routeTable
 az network vnet subnet update -g $rg -n DmzFunction --vnet-name JJDevV2NetworkApp --remove routeTable
+az network vnet subnet update -g $rg -n DmzAses --vnet-name JJDevV2NetworkApp --remove routeTable
 az network vnet subnet update -g $rg -n GatewaySubnet --vnet-name JJDevV2Network --remove routeTable
 az network vnet subnet update -g $rg -n AzureApplicationGatewaySubnet --vnet-name JJDevV2Network --remove routeTable
 az network vnet subnet update -g $rg -n DmzApiMngmt --vnet-name JJDevV2Network --remove routeTable
