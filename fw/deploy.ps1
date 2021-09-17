@@ -1,4 +1,4 @@
-rg='JJDevV2-Infra'
+$rg ='JJDevV2-Infra'
 
 # install firewall and add routes
 az deployment group create -g $rg --template-file deploy-fw.bicep
