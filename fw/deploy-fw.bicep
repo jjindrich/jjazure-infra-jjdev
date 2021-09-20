@@ -347,8 +347,8 @@ resource fwPolicyRule 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2
             ]
             fqdnTags: []
             targetFqdns: [
-              'management.azure.com'
-              //environment().resourceManager
+              //'management.azure.com'
+              split(environment().resourceManager, '/')[2]
             ]
             targetUrls: []
             terminateTLS: false
@@ -368,8 +368,9 @@ resource fwPolicyRule 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2
               }
             ]
             fqdnTags: []
-            targetFqdns: [
-              'login.microsoftonline.com'
+            targetFqdns: [              
+              //'login.microsoftonline.com'
+              split(environment().authentication.loginEndpoint, '/')[2]
             ]
             targetUrls: []
             terminateTLS: false
@@ -954,7 +955,8 @@ resource fwPolicyRule2 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@
             ]
             fqdnTags: []
             targetFqdns: [
-              '*.blob.core.windows.net'
+              //'*.blob.core.windows.net'
+              '*.blob.${environment().suffixes.storage}'
             ]
             targetUrls: []
             terminateTLS: false
