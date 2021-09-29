@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "value": "jjrancher"
+        },
+        "adminUsername": {
+            "value": "jj"
+        },
+        "virtualNetworkName": {
+            "value": "jjrancher-vnet"
+        },
+        "networkSecurityGroupName": {
+            "value": "jjrancher-nsg"
+        },
+        "adminPasswordOrKey": {
+            "value": "<PASSWORD>"
+        },
+        "appId": {
+            "value": "30b63f8d-eb8d-4618-9bd6-1e0b548bb8ca"
+        },
+        "password": {
+            "value": "<SECRET>"
+        },
+        "tenantId": {
+            "value": "5bf07991-ef59-43e0-861c-ab35a6cfc932"
+        }                              
+    }
+}
