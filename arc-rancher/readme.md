@@ -43,6 +43,8 @@ Next go to Azure Portal and add new Application Services extension to Kubernetes
 - storage class local-path
 - And copy script and run it 
 
+How Custom location works docs https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations
+
 ### Deployment errors
 
 Custom location deployment failed:
