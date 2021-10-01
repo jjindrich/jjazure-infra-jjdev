@@ -1,6 +1,8 @@
-# Deploy Rancher with Azure Arc
+# Deploy Rancher K3s with Azure Arc and Azure Services
 
-## Deploy using jumpstart
+Prepare App registration for adding K3s in Azure Arc - jjrancherk3s
+
+## Deploy K3s using jumpstart
 
 Docs https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/rancher_k3s/azure_arm_template/
 
@@ -18,9 +20,70 @@ az deployment group create `
 --parameters azuredeploy.parameters.json
 ```
 
+Remove from k3s default ingress Traefik because conflicting 443 port
+
+```ps
+helm delete traefik -n kube-system
+```
+
+!!! There is a bug - hardcoded iod for custom location. Check issue https://github.com/microsoft/azure_arc/issues/785
+
+## Deploy K3s using script
+
+Create VM
+
+```powershell
+$rg = "jjrancher-rg"
+$myip=$(curl -4 ifconfig.io)
+az group create -n $rg -l westeurope
+
+az network nsg create -g $rg -n jjrancher-nsg
+az network nsg rule create -g $rg `
+    --nsg-name jjrancher-nsg `
+    -n ssh `
+    --priority 150 `
+    --source-address-prefixes $myip/32 `
+    --destination-port-ranges 22 `
+    --protocol Tcp `
+    --description ssh
+az vm create -n jjrancher -g $rg --image UbuntuLTS `
+    --size Standard_B2ms --authentication-type password --admin-username jj `
+    --nsg jjrancher-nsg --public-ip-address jjrancher-ip --storage-sku StandardSSD_LRS 
+```
+
+Install K3s and connect to Azure Arc
+
+```sh
+# Install K3s without Traefik
+curl -sfL https://get.k3s.io | sh -s - --disable=traefik
+
+# Install Azure CLI and extensions
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+az extension add --upgrade --yes --name connectedk8s
+az extension add --upgrade --yes --name k8s-extension
+az extension add --upgrade --yes --name customlocation
+az extension remove --name appservice-kube
+az extension add --yes --source "https://aka.ms/appsvc/appservice_kube-latest-py2.py3-none-any.whl"
+
+#az login --tenant jjdev.onmicrosoft.com --service-principal -u 30b63f8d-eb8d-4618-9bd6-1e0b548bb8ca -p <SECRET>
+az login
+mkdir .kube
+sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+sudo chown jj:jj ~/.kube
+sudo chown jj:jj ~/.kube/config
+export KUBECONFIG=~/.kube/config
+
+az connectedk8s connect -g jjrancher-rg -n jjrancher
+az connectedk8s show -g jjrancher-rg -n jjrancher --query provisioningState   # Should show Succeeded
+```
+
+!!! There is a bug - when using service principal, deployment of custom location will fail
+
 ## Deploy App Service extension
 
 Docs https://docs.microsoft.com/en-us/Azure/app-service/manage-create-arc-environment
+
+Custom location works docs https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations
 
 Create prereq resources
 
@@ -30,30 +93,9 @@ az network public-ip create --resource-group $rg --name jjrancherapps-ip --sku S
 $staticIp=$(az network public-ip show --resource-group $rg --name jjrancherapps-ip --output tsv --query ipAddress)
 ```
 
-Remove from k3s default ingress Traefik because conflicting 443 port
-
-```ps
-helm delete traefik -n kube-system
-```
-
 Next go to Azure Portal and add new Application Services extension to Kubernetes - Azure Arc
 - instance name jjrancherapps
 - new custom location jjrancherloc
 - static IP from prereq
 - storage class local-path
 - And copy script and run it 
-
-How Custom location works docs https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations
-
-### Deployment errors
-
-Custom location deployment failed:
-
-    ERROR: Deployment failed. Correlation ID: 4a68707f-01c2-47eb-9dc1-e7f779304d2f. "Microsoft.ExtendedLocation" resource provider does not have the required permissions to create a namespace on the cluster. Refer to https://aka.ms/ArcK8sCustomLocationsDocsEnableFeature to provide the required permissions to the resource provider.
-
-There is problem with assigned roles to some service principal - creating namespace ???
-
-When deleting Custom location you will get this error:
-Deployment failed. Correlation ID: 073bc603-469f-46d3-ac10-164b706eee3a. The operation to Get the Namespace: "jjrancherloc", failed with the following error: "namespaces \"jjrancherloc\" is forbidden: User \"3848bfa9-e47b-4857-8e4f-5d115bbf763c\" cannot get resource \"namespaces\" in API group \"\" in the namespace \"jjrancherloc\""
-
-User 3848bfa9-e47b-4857-8e4f-5d115bbf763c is Custom Locations RP.
