@@ -26,7 +26,7 @@ Remove from k3s default ingress Traefik because conflicting 443 port
 helm delete traefik -n kube-system
 ```
 
-!!! There is a bug - hardcoded iod for custom location. Check issue https://github.com/microsoft/azure_arc/issues/785
+!!! **There is a bug** - hardcoded iod for custom location. Check issue https://github.com/microsoft/azure_arc/issues/785
 
 ## Deploy K3s using script
 
@@ -77,7 +77,7 @@ az connectedk8s connect -g jjrancher-rg -n jjrancher
 az connectedk8s show -g jjrancher-rg -n jjrancher --query provisioningState   # Should show Succeeded
 ```
 
-!!! There is a bug - when using service principal, deployment of custom location will fail
+!!! *There is a bug* - when using service principal, deployment of custom location will fail
 
 ## Deploy App Service extension
 
@@ -85,17 +85,22 @@ Docs https://docs.microsoft.com/en-us/Azure/app-service/manage-create-arc-enviro
 
 Custom location works docs https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations
 
-Create prereq resources
+Next go to Azure Portal and add new Application Services extension to Kubernetes - Azure Arc
+- instance name - jjrancherapps
+- new custom location - jjrancherloc
+- static IP - VM public ip
+- storage class - local-path
+- And copy script and run it 
+
+Next add NSG rule to allow communication for web
 
 ```powershell
-$rg="jjrancher-rg"
-az network public-ip create --resource-group $rg --name jjrancherapps-ip --sku STANDARD
-$staticIp=$(az network public-ip show --resource-group $rg --name jjrancherapps-ip --output tsv --query ipAddress)
+$rg = "jjrancher-rg"
+az network nsg rule create -g $rg `
+    --nsg-name jjrancher-nsg `
+    -n web `
+    --priority 160 `
+    --source-address-prefixes * `
+    --destination-port-ranges 443 `
+    --protocol Tcp
 ```
-
-Next go to Azure Portal and add new Application Services extension to Kubernetes - Azure Arc
-- instance name jjrancherapps
-- new custom location jjrancherloc
-- static IP from prereq
-- storage class local-path
-- And copy script and run it 
