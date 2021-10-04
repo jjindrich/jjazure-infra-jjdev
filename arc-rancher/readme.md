@@ -65,15 +65,17 @@ az extension add --upgrade --yes --name customlocation
 az extension remove --name appservice-kube
 az extension add --yes --source "https://aka.ms/appsvc/appservice_kube-latest-py2.py3-none-any.whl"
 
-#az login --tenant jjdev.onmicrosoft.com --service-principal -u 30b63f8d-eb8d-4618-9bd6-1e0b548bb8ca -p <SECRET>
-az login
+az login --tenant jjdev.onmicrosoft.com --service-principal -u 30b63f8d-eb8d-4618-9bd6-1e0b548bb8ca -p <SECRET>
+
 mkdir .kube
 sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
 sudo chown jj:jj ~/.kube
 sudo chown jj:jj ~/.kube/config
 export KUBECONFIG=~/.kube/config
 
-az connectedk8s connect -g jjrancher-rg -n jjrancher
+# connect using Custom Locations RP
+export oid=$(az ad sp show --id 'bc313c14-388c-4e7d-a58e-70017303ee3b' --query objectId -o tsv)
+az connectedk8s connect -g jjrancher-rg -n jjrancher --custom-location-oid $oid
 az connectedk8s show -g jjrancher-rg -n jjrancher --query provisioningState   # Should show Succeeded
 ```
 
