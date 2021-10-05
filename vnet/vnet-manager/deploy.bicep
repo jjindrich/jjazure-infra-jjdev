@@ -41,7 +41,7 @@ module vnet4Module 'deploy-vnet.bicep' = {
     password: password
     vnetName: 'jjvnet4'
     vnetAddressPrefix: '10.4'
-    vmjumpName: 'jjvmjump'
+    vmjumpName: 'jjvmjump4'
   }
 }
 
