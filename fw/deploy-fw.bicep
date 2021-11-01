@@ -58,6 +58,10 @@ resource fw 'Microsoft.Network/azureFirewalls@2021-02-01' = {
     '2'
     '3'
   ]
+  dependsOn: [
+    fwPolicyRule
+    fwPolicyRule2
+  ]
   properties: {
     sku: {
       name: 'AZFW_VNet'
