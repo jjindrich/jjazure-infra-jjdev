@@ -1,4 +1,5 @@
 param fwName string = 'jjdevv2fw'
+param fwTier string = 'Premium' // Standard or Premium
 param location string = 'westeurope'
 
 param virtualNetworkName string = 'JJDevV2Network'
@@ -65,7 +66,7 @@ resource fw 'Microsoft.Network/azureFirewalls@2021-02-01' = {
   properties: {
     sku: {
       name: 'AZFW_VNet'
-      tier: 'Standard'
+      tier: fwTier
     }
     threatIntelMode: 'Alert'
     additionalProperties: {}
@@ -96,7 +97,7 @@ resource fwPolicy 'Microsoft.Network/firewallPolicies@2021-02-01' = {
   location: location
   properties: {
     sku: {
-      tier: 'Standard'
+      tier: fwTier
     }
   }
 }
