@@ -349,7 +349,7 @@
                     {
                         "name": "AzureBastionSubnet",
                         "properties": {
-                            "addressPrefix": "10.3.254.0/27",
+                            "addressPrefix": "10.3.254.0/26",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('vnetHubName'),'-BastionSubnet'))]"
                             },
