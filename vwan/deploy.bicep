@@ -25,20 +25,24 @@ module hubModule1 'deploy-hub.bicep' = {
     addressPrefixHub: '10.101.250.0/24'
     addressPrefixVnetApp1: '10.101.1.0/24'
     addressPrefixVnetApp2: '10.101.2.0/24'
+    connectBR1Site: true
+    adminUsername: 'jj'
     adminPassword: password
   }
 }
 
-//  Hub Region2
-module hubModule2 'deploy-hub.bicep' = {
-  name: 'HubModule2'
-  params:{
-    vwanName: vwanName
-    hubLocation: region2Location
-    hubSuffix: region2Suffix
-    addressPrefixHub: '10.102.250.0/24'
-    addressPrefixVnetApp1: '10.102.1.0/24'
-    addressPrefixVnetApp2: '10.102.2.0/24'
-    adminPassword: password
-  }
-}
+// //  Hub Region2
+// module hubModule2 'deploy-hub.bicep' = {
+//   name: 'HubModule2'
+//   params:{
+//     vwanName: vwanName
+//     hubLocation: region2Location
+//     hubSuffix: region2Suffix
+//     addressPrefixHub: '10.102.250.0/24'
+//     addressPrefixVnetApp1: '10.102.1.0/24'
+//     addressPrefixVnetApp2: '10.102.2.0/24'
+//     connectBR1Site: false
+//     adminUsername: 'jj'
+//     adminPassword: password
+//   }
+// }
