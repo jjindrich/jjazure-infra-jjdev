@@ -30,7 +30,7 @@ resource hub 'Microsoft.Network/virtualHubs@2020-11-01' = {
 }
 
 // VPN GW in HUB
-resource vpnGw 'Microsoft.Network/vpnGateways@2021-03-01' = {
+resource vpnGw 'Microsoft.Network/vpnGateways@2021-03-01' = if (connectBR1Site) {
   name: '${vwanName}-vpnGw'
   location: hubLocation
   properties: {
@@ -40,7 +40,7 @@ resource vpnGw 'Microsoft.Network/vpnGateways@2021-03-01' = {
   }
 }
 
-// VPN link and connect into JJBR1
+// // VPN link and connect into JJBR1
 resource vpnLinkBr1 'Microsoft.Network/vpnSites@2021-03-01' = if (connectBR1Site){
   name: '${vwanName}-jjbr1'
   location: hubLocation
@@ -53,7 +53,7 @@ resource vpnLinkBr1 'Microsoft.Network/vpnSites@2021-03-01' = if (connectBR1Site
     }
     addressSpace: {
       addressPrefixes: [
-        '10.1.0.0/16'
+        '169.254.10.2/32'
       ]
     }
     vpnSiteLinks: [
@@ -61,9 +61,13 @@ resource vpnLinkBr1 'Microsoft.Network/vpnSites@2021-03-01' = if (connectBR1Site
         name: 'BR1-office'
         properties:{
           ipAddress: '194.213.40.56'
+          bgpProperties: {
+            asn: 65100
+            bgpPeeringAddress: '169.254.10.2'
+          }          
           linkProperties:{
             linkProviderName: 'MS-office'
-            linkSpeedInMbps: 10
+            linkSpeedInMbps: 10            
           }
         }
       }
@@ -84,8 +88,9 @@ resource vpnLinkBr1Conn 'Microsoft.Network/vpnGateways/vpnConnections@2021-03-01
           sharedKey: 'abc123'
           vpnConnectionProtocolType: 'IKEv2'
           connectionBandwidth: 10
+          enableBgp: true
           vpnSiteLink: {
-            id: vpnLinkBr1.properties.vpnSiteLinks[0].id
+            id: vpnLinkBr1.properties.vpnSiteLinks[0].id            
           }
         }
       }

@@ -31,7 +31,7 @@ module hubModule1 'deploy-hub.bicep' = {
   }
 }
 
-// //  Hub Region2
+//  Hub Region2
 // module hubModule2 'deploy-hub.bicep' = {
 //   name: 'HubModule2'
 //   params:{
