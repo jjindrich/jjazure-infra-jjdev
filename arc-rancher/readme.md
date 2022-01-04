@@ -75,17 +75,17 @@ export KUBECONFIG=~/.kube/config
 
 # connect using Custom Locations RP
 export oid=$(az ad sp show --id 'bc313c14-388c-4e7d-a58e-70017303ee3b' --query objectId -o tsv)
-az connectedk8s connect -g jjrancher-rg -n jjrancher --custom-location-oid $oid
+az connectedk8s connect -g jjrancher-rg -n jjrancher --custom-locations-oid $oid
 az connectedk8s show -g jjrancher-rg -n jjrancher --query provisioningState   # Should show Succeeded
 ```
 
-!!! *There is a bug* - when using service principal, deployment of custom location will fail
+Now you will see Azure Arc for Kubernetes resource for jjrancher in Azure Portal.
 
 ## Deploy App Service extension
 
 Docs https://docs.microsoft.com/en-us/Azure/app-service/manage-create-arc-environment
 
-Custom location works docs https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations
+Custom location docs https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations
 
 Next go to Azure Portal and add new Application Services extension to Kubernetes - Azure Arc
 - instance name - jjrancherapps
@@ -93,6 +93,8 @@ Next go to Azure Portal and add new Application Services extension to Kubernetes
 - static IP - VM public ip
 - storage class - local-path
 - And copy script and run it 
+
+Now you can see Custom location jjrancherloc and App Service Kubernetes Environment resource using this custom location.
 
 Next add NSG rule to allow communication for web
 
@@ -106,3 +108,5 @@ az network nsg rule create -g $rg `
     --destination-port-ranges 443 `
     --protocol Tcp
 ```
+
+Now you can deploy Azure Functions / Web App into Region jjrancherloc.
