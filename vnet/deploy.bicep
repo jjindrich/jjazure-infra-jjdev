@@ -361,7 +361,7 @@ resource vnetHub_to_vnetApp 'Microsoft.Network/virtualNetworks/virtualNetworkPee
 }
 
 /*
-******** HUB VPN Gateway ********
+******** HUB VPN Gateway with connection JJDevBR1 *******
 */
 resource subnetVpnGw 'Microsoft.Network/virtualNetworks/subnets@2020-05-01' = {
   parent: vnetHub
@@ -419,6 +419,40 @@ resource vpnGw 'Microsoft.Network/virtualNetworkGateways@2021-05-01' = {
     enableBgp: true
     bgpSettings: {
       asn: 65515
+    }
+  }
+}
+resource localVpnSite 'Microsoft.Network/localNetworkGateways@2021-05-01' = {
+  name: 'JJDevBR1'
+  location: resourceGroup().location
+  properties:{
+    gatewayIpAddress: '194.213.40.56'
+    bgpSettings: {
+      asn: 65100
+      bgpPeeringAddress: '10.1.0.10'
+    }
+    localNetworkAddressSpace: {
+      addressPrefixes: [
+          '10.1.0.10/32'
+      ]
+    }
+  }
+}
+resource connVpn 'Microsoft.Network/connections@2021-05-01' = {
+  name: 'JJDevBR1-to-${vpnGwName}'
+  location: resourceGroup().location
+  properties: {
+    connectionType: 'IPsec'
+    connectionProtocol: 'IKEv2'
+    sharedKey: 'abc123'
+    enableBgp: true
+    virtualNetworkGateway1: {
+      id: vpnGw.id
+      properties: {}
+    }
+    localNetworkGateway2: {
+      id: localVpnSite.id
+      properties: {}
     }
   }
 }

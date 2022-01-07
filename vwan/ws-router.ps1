@@ -1,4 +1,5 @@
 # Script to configure Windows Server RRAS using BGP
+# Site configuration: JJDevBR1 for JJWan
 
 # Set variables - vWAN -> VPN GW configuration
 $HubAddressSpace = "10.101.250.0/24:100"
