@@ -2,13 +2,7 @@ param vwanName string
 param hubLocation string
 param hubSuffix string
 param addressPrefixHub string
-param addressPrefixVnetApp1 string
-param addressPrefixVnetApp2 string
 param connectBR1Site bool
-@secure()
-param adminUsername string
-@secure()
-param adminPassword string
 
 // reference existing vWan
 resource vwan 'Microsoft.Network/virtualWans@2020-11-01' existing = {
@@ -28,6 +22,8 @@ resource hub 'Microsoft.Network/virtualHubs@2020-11-01' = {
     allowBranchToBranchTraffic: true
   }
 }
+
+output hubName string = hub.name
 
 // VPN GW in HUB
 resource vpnGw 'Microsoft.Network/vpnGateways@2021-03-01' = if (connectBR1Site) {
@@ -98,121 +94,32 @@ resource vpnLinkBr1Conn 'Microsoft.Network/vpnGateways/vpnConnections@2021-03-01
   }
 }
 
-// virtual network App1 and link to HUB
-resource vnetApp1 'Microsoft.Network/virtualNetworks@2020-11-01' = {
-  name: '${vwanName}-${hubSuffix}-app1'
+// Secure Hub with Azure Firewall and policy
+resource azfw 'Microsoft.Network/azureFirewalls@2020-11-01' = {
+  name: '${vwanName}-Fw'
   location: hubLocation
   properties: {
-    addressSpace: {
-      addressPrefixes: [
-        addressPrefixVnetApp1
-      ]
-    }
-    subnets: [
-      {
-        name: 'snet-default'
-        properties: {
-          addressPrefix: addressPrefixVnetApp1
-        }
+    hubIPAddresses: {
+      publicIPs: {
+        count: 1
       }
-    ]
-  }
-}
-resource connectionApp1 'Microsoft.Network/virtualHubs/hubVirtualNetworkConnections@2020-11-01' = {
-  name: '${vwanName}-${hubSuffix}-app1'
-  parent: hub
-  properties: {
-    remoteVirtualNetwork: {
-      id: vnetApp1.id
     }
+    sku: {
+      name: 'AZFW_Hub'
+      tier: 'Standard'
+    }
+    virtualHub: {
+      id: hub.id      
+    }
+    firewallPolicy: {
+      id: fwPolicy.id      
+    }  
   }
 }
-
-// virtual network App2 and link to HUB
-resource vnetApp2 'Microsoft.Network/virtualNetworks@2020-11-01' = {
-  name: '${vwanName}-${hubSuffix}-app2'
+resource fwPolicy 'Microsoft.Network/firewallPolicies@2020-11-01' = {
+  name: '${vwanName}-Fw-policy'
   location: hubLocation
   properties: {
-    addressSpace: {
-      addressPrefixes: [
-        addressPrefixVnetApp2
-      ]
-    }
-    subnets: [
-      {
-        name: 'snet-default'
-        properties: {
-          addressPrefix: addressPrefixVnetApp2
-        }
-      }
-    ]
-  }
-}
-resource connectionApp2 'Microsoft.Network/virtualHubs/hubVirtualNetworkConnections@2020-11-01' = {
-  name: '${vwanName}-${hubSuffix}-app2'
-  parent: hub
-  properties: {
-    remoteVirtualNetwork: {
-      id: vnetApp2.id
-    }
-  }
-}
-
-// VM in App1 vnet
-resource vmApp1Nic 'Microsoft.Network/networkInterfaces@2020-06-01' = {
-  name: '${vwanName}-${hubSuffix}-app1-vm1-nic'
-  location: hubLocation
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'ipconfig1'
-        properties: {
-          subnet: {
-            id: vnetApp1.properties.subnets[0].id
-          }
-          privateIPAllocationMethod: 'Dynamic'
-        }
-      }
-    ]
-  }
-}
-resource vmApp1 'Microsoft.Compute/virtualMachines@2020-12-01' = {
-  name: '${vwanName}-${hubSuffix}-app1-vm1'
-  location: hubLocation
-  properties: {
-    osProfile: {
-      computerName: '${vwanName}-${hubSuffix}-app1-vm1'
-      adminUsername: adminUsername
-      adminPassword: adminPassword
-      linuxConfiguration: {
-        disablePasswordAuthentication: false
-      }
-    }
-    hardwareProfile: {
-      vmSize: 'Standard_B1ms'
-    }
-    storageProfile: {
-      imageReference: {
-        publisher: 'Canonical'
-        offer: 'UbuntuServer'
-        sku: '18.04-LTS'
-        version: 'latest'
-      }
-      osDisk: {
-        createOption: 'FromImage'
-        name: '${vwanName}-${hubSuffix}-app1-vm1-osdisk'
-      }
-      dataDisks: []
-    }
-    networkProfile: {
-      networkInterfaces: [
-        {
-          properties: {
-            primary: true
-          }
-          id: vmApp1Nic.id
-        }
-      ]
-    }
-  }
+    threatIntelMode: 'Alert'
+  }  
 }
