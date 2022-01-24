@@ -15,22 +15,27 @@ resource vwan 'Microsoft.Network/virtualWans@2020-11-01' = {
   location: location
 }
 
+// ----------------------------------------------------------
+// ------------------------ Region 1 ------------------------
+// ----------------------------------------------------------
+
 //  Hub Region1
 module hub1 'deploy-hub.bicep' = {
   name: 'Hub1'
-  params:{
+  params: {
     vwanName: vwanName
     hubLocation: region1Location
     hubSuffix: region1Suffix
     connectBR1Site: true
     addressPrefixHub: '10.101.250.0/24'
+    secureHub: true
   }
 }
 
 // Vnets conneted to Hub1: app1, app2
 module hub1Vnet1 'deploy-vnet.bicep' = {
   name: 'Hub1Vnet1'
-  params:{
+  params: {
     hubName: hub1.outputs.hubName
     vnetName: 'app1'
     addressPrefixVnet: '10.101.1.0/24'
@@ -39,7 +44,7 @@ module hub1Vnet1 'deploy-vnet.bicep' = {
 }
 module hub1Vnet2 'deploy-vnet.bicep' = {
   name: 'Hub1Vnet2'
-  params:{
+  params: {
     hubName: hub1.outputs.hubName
     vnetName: 'app2'
     addressPrefixVnet: '10.101.2.0/24'
@@ -48,9 +53,9 @@ module hub1Vnet2 'deploy-vnet.bicep' = {
 }
 
 //VMs
-module app1Vm1 'deploy-vm.bicep' = {
-  name: 'app1Vm1'
-  params:{
+module hub1App1Vm1 'deploy-vm.bicep' = {
+  name: 'hub1App1Vm1'
+  params: {
     vnetName: hub1Vnet1.outputs.vnetName
     subnetName: hub1Vnet1.outputs.subnetName
     vmName: '${hub1Vnet1.outputs.vnetName}-vm1'
@@ -59,14 +64,55 @@ module app1Vm1 'deploy-vm.bicep' = {
     location: region1Location
   }
 }
-module app2Vm1 'deploy-vm.bicep' = {
-  name: 'app2Vm1'
-  params:{
+module hub1App2Vm1 'deploy-vm.bicep' = {
+  name: 'hub1App2Vm1'
+  params: {
     vnetName: hub1Vnet2.outputs.vnetName
     subnetName: hub1Vnet2.outputs.subnetName
     vmName: '${hub1Vnet2.outputs.vnetName}-vm1'
     adminUsername: 'jj'
     adminPassword: password
     location: region1Location
+  }
+}
+
+// ----------------------------------------------------------
+// ------------------------ Region 2 ------------------------
+// ----------------------------------------------------------
+
+//  Hub Region2
+module hub2 'deploy-hub.bicep' = {
+  name: 'Hub2'
+  params: {
+    vwanName: vwanName
+    hubLocation: region2Location
+    hubSuffix: region2Suffix
+    connectBR1Site: false
+    addressPrefixHub: '10.102.250.0/24'
+    secureHub: false
+  }
+}
+
+// Vnets conneted to Hub1: app1
+module hub2Vnet1 'deploy-vnet.bicep' = {
+  name: 'Hub2Vnet1'
+  params: {
+    hubName: hub2.outputs.hubName
+    vnetName: 'app1'
+    addressPrefixVnet: '10.102.1.0/24'
+    location: region2Location
+  }
+}
+
+//VMs
+module hub2App1Vm1 'deploy-vm.bicep' = {
+  name: 'hub2App1Vm1'
+  params: {
+    vnetName: hub2Vnet1.outputs.vnetName
+    subnetName: hub2Vnet1.outputs.subnetName
+    vmName: '${hub2Vnet1.outputs.vnetName}-vm1'
+    adminUsername: 'jj'
+    adminPassword: password
+    location: region2Location
   }
 }

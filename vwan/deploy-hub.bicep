@@ -2,7 +2,8 @@ param vwanName string
 param hubLocation string
 param hubSuffix string
 param addressPrefixHub string
-param connectBR1Site bool
+param connectBR1Site bool = false
+param secureHub bool = false
 
 // reference existing vWan
 resource vwan 'Microsoft.Network/virtualWans@2020-11-01' existing = {
@@ -27,7 +28,7 @@ output hubName string = hub.name
 
 // VPN GW in HUB
 resource vpnGw 'Microsoft.Network/vpnGateways@2021-03-01' = if (connectBR1Site) {
-  name: '${vwanName}-vpnGw'
+  name: '${vwanName}-${hubSuffix}-vpnGw'
   location: hubLocation
   properties: {
     virtualHub: {
@@ -38,7 +39,7 @@ resource vpnGw 'Microsoft.Network/vpnGateways@2021-03-01' = if (connectBR1Site) 
 
 // // VPN link and connect into JJBR1
 resource vpnLinkBr1 'Microsoft.Network/vpnSites@2021-03-01' = if (connectBR1Site){
-  name: '${vwanName}-jjbr1'
+  name: '${vwanName}-${hubSuffix}-jjbr1'
   location: hubLocation
   properties: {
     virtualWan: {
@@ -71,7 +72,7 @@ resource vpnLinkBr1 'Microsoft.Network/vpnSites@2021-03-01' = if (connectBR1Site
   }
 }
 resource vpnLinkBr1Conn 'Microsoft.Network/vpnGateways/vpnConnections@2021-03-01' = if (connectBR1Site) {
-  name: '${vwanName}-vpnGw-jjbr1'
+  name: '${vwanName}-${hubSuffix}-vpnGw-jjbr1'
   parent: vpnGw
   properties: {
     remoteVpnSite: {
@@ -79,7 +80,7 @@ resource vpnLinkBr1Conn 'Microsoft.Network/vpnGateways/vpnConnections@2021-03-01
     }
     vpnLinkConnections:[
       {
-        name: '${vwanName}-vpnGw-jjbr1'
+        name: '${vwanName}-${hubSuffix}-vpnGw-jjbr1'
         properties:{
           sharedKey: 'abc123'
           vpnConnectionProtocolType: 'IKEv2'
@@ -95,8 +96,8 @@ resource vpnLinkBr1Conn 'Microsoft.Network/vpnGateways/vpnConnections@2021-03-01
 }
 
 // Secure Hub with Azure Firewall and policy
-resource azfw 'Microsoft.Network/azureFirewalls@2020-11-01' = {
-  name: '${vwanName}-Fw'
+resource azfw 'Microsoft.Network/azureFirewalls@2020-11-01' = if (secureHub) {
+  name: '${vwanName}-${hubSuffix}-Fw'
   location: hubLocation
   properties: {
     hubIPAddresses: {
@@ -116,8 +117,8 @@ resource azfw 'Microsoft.Network/azureFirewalls@2020-11-01' = {
     }  
   }
 }
-resource fwPolicy 'Microsoft.Network/firewallPolicies@2020-11-01' = {
-  name: '${vwanName}-Fw-policy'
+resource fwPolicy 'Microsoft.Network/firewallPolicies@2020-11-01' = if (secureHub) {
+  name: '${vwanName}-${hubSuffix}-Fw-policy'
   location: hubLocation
   properties: {
     threatIntelMode: 'Alert'
