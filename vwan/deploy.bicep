@@ -3,8 +3,8 @@ param location string = resourceGroup().location
 param vwanName string = 'jjvwan'
 param region1Location string = 'West Europe'
 param region1Suffix string = 'weu'
-param region2Location string = 'Germany West Central'
-param region2Suffix string = 'ger'
+param region2Location string = 'North Europe'
+param region2Suffix string = 'neu'
 
 @secure()
 param password string
@@ -19,14 +19,13 @@ resource vwan 'Microsoft.Network/virtualWans@2020-11-01' = {
 // ------------------------ Region 1 ------------------------
 // ----------------------------------------------------------
 
-//  Hub Region1
-module hub1 'deploy-hub.bicep' = {
+//  Hub Region1 with VPN
+module hub1 'deploy-hubfull.bicep' = {
   name: 'Hub1'
   params: {
     vwanName: vwanName
     hubLocation: region1Location
     hubSuffix: region1Suffix
-    connectBR1Site: true
     addressPrefixHub: '10.101.250.0/24'
     secureHub: true
   }
@@ -79,7 +78,6 @@ module hub1App2Vm1 'deploy-vm.bicep' = {
 // ----------------------------------------------------------
 // ------------------------ Region 2 ------------------------
 // ----------------------------------------------------------
-
 //  Hub Region2
 module hub2 'deploy-hub.bicep' = {
   name: 'Hub2'
@@ -87,7 +85,6 @@ module hub2 'deploy-hub.bicep' = {
     vwanName: vwanName
     hubLocation: region2Location
     hubSuffix: region2Suffix
-    connectBR1Site: false
     addressPrefixHub: '10.102.250.0/24'
     secureHub: false
   }
