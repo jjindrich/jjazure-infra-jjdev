@@ -6,7 +6,7 @@ az group create -n $rg -l westeurope
 $vnet=$(az network vnet subnet show --vnet-name JJDevV2NetworkApp -g $rgNetwork -n DmzAci --query id -o tsv )
 
 $val = 1
-while($val -ne 60)
+while($val -ne 100)
 {
     az container create -g $rg -n jjaci$val `
     --image mcr.microsoft.com/azuredocs/aci-helloworld `
