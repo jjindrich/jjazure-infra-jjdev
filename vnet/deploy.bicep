@@ -490,6 +490,23 @@ resource nsgAppAks 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
           destinationAddressPrefixes: []
         }
       }
+      {
+        name: 'HTTPS'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '443'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 310
+          direction: 'Inbound'
+          sourcePortRanges: []
+          destinationPortRanges: []
+          sourceAddressPrefixes: []
+          destinationAddressPrefixes: []
+        }
+      }
     ]
   }
 }

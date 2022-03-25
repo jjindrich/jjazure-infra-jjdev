@@ -77,7 +77,7 @@
                 "healthProbeSettings": {
                     "probePath": "/",
                     "probeRequestType": "HEAD",
-                    "probeProtocol": "Http",
+                    "probeProtocol": "Https",
                     "probeIntervalInSeconds": 100
                 },
                 "sessionAffinityState": "Disabled"
@@ -172,7 +172,7 @@
                 ],
                 "compressionSettings": {},
                 "queryStringCachingBehavior": "UseQueryString",
-                "forwardingProtocol": "HttpOnly",
+                "forwardingProtocol": "HttpsOnly",
                 "linkToDefaultDomain": "Enabled",
                 "httpsRedirect": "Enabled"
             }
