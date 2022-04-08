@@ -557,7 +557,7 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         properties: {
           addressPrefix: '10.4.3.0/24'
           networkSecurityGroup: {
-            id: nsgAppDefault.id
+            id: nsgAppAks.id
           }
           serviceEndpoints: []
           delegations: []
