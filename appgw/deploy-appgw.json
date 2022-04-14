@@ -34,6 +34,9 @@
         },
         "certificateSecretId": {
             "type": "string"
+        },
+        "certificateClientData": {
+            "type": "string"
         }
     },
     "variables": {
@@ -72,7 +75,7 @@
             "zones": "[if(equals(length(parameters('availabilityZones')), 0), json('null'), parameters('availabilityZones'))]",
             "identity": {
                 "type": "UserAssigned",
-                "userAssignedIdentities" : {
+                "userAssignedIdentities": {
                     "[concat(subscription().id,parameters('identityId'))]": {}
                 }
             },
@@ -103,6 +106,33 @@
                     }
                 ],
                 "trustedRootCertificates": [
+                ],
+                "trustedClientCertificates": [
+                    {
+                        "name": "clientCert",
+                        "properties": {
+                            "data": "[parameters('certificateClientData')]"
+                        }
+                    }
+                ],
+                "sslProfiles": [
+                    {
+                        "name": "sslProfile1",
+                        "properties": {
+                            "trustedClientCertificates": [
+                                {
+                                    "Id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/trustedClientCertificates/clientCert')]"
+                                }
+                            ],
+                            "clientAuthConfiguration": {
+                                "verifyClientCertIssuerDN": false
+                            },
+                            "sslPolicy": {
+                                "policyType": "Predefined",
+                                "policyName": "AppGwSslPolicy20170401"
+                            }
+                        }
+                    }
                 ],
                 "frontendIPConfigurations": [
                     {
@@ -232,6 +262,9 @@
                             "protocol": "Https",
                             "sslCertificate": {
                                 "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/sslCertificates/listen-public-sslvaultCert')]"
+                            },
+                            "SslProfile": {
+                                "Id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/sslProfiles/sslProfile1')]"
                             },
                             "hostNames": [
                             ],
