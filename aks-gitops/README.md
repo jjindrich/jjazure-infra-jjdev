@@ -13,3 +13,5 @@ Remove GitOps configuration
 ```powershell
 az k8s-configuration flux delete -g jjmicroservices-rg -c jjaks -n jjaks-gitops -t managedClusters
 ```
+
+If you change/add manifest, changes are reflected in 10 mins (after commit in master).
