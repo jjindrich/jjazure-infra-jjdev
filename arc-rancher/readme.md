@@ -6,28 +6,6 @@ Prepare App registration for adding K3s in Azure Arc - jjrancherk3s
 
 Docs https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/rancher_k3s/azure_arm_template/
 
-Clone repository and navigate to azure_arc/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template
-
-Update azuredeploy.parameters.json with service principal credentials you created.
-
-```powershell
-az group create -n jjrancher-rg -l westeurope
-
-az deployment group create `
---resource-group jjrancher-rg `
---name jjrancher `
---template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json `
---parameters azuredeploy.parameters.json
-```
-
-Remove from k3s default ingress Traefik because conflicting 443 port
-
-```ps
-helm delete traefik -n kube-system
-```
-
-!!! **There is a bug** - hardcoded iod for custom location. Check issue https://github.com/microsoft/azure_arc/issues/785
-
 ## Deploy K3s using script
 
 Create VM
@@ -62,9 +40,9 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 az extension add --upgrade --yes --name connectedk8s
 az extension add --upgrade --yes --name k8s-extension
 az extension add --upgrade --yes --name customlocation
-az extension remove --name appservice-kube
-az extension add --yes --source "https://aka.ms/appsvc/appservice_kube-latest-py2.py3-none-any.whl"
+az extension add --upgrade --yes --name appservice-kube
 
+# login using existing Service principal jjrancherk3s
 az login --tenant jjdev.onmicrosoft.com --service-principal -u 30b63f8d-eb8d-4618-9bd6-1e0b548bb8ca -p <SECRET>
 
 mkdir .kube
@@ -87,7 +65,7 @@ Docs https://docs.microsoft.com/en-us/Azure/app-service/manage-create-arc-enviro
 
 Custom location docs https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations
 
-Next go to Azure Portal and add new Application Services extension to Kubernetes - Azure Arc
+Next go to Azure Portal and add new *Application Services* extension to *Kubernetes - Azure Arc*
 - instance name - jjrancherapps
 - new custom location - jjrancherloc
 - static IP - VM public ip
@@ -110,3 +88,74 @@ az network nsg rule create -g $rg `
 ```
 
 Now you can deploy Azure Functions / Web App into Region jjrancherloc.
+
+## Deploy Data controller extension
+
+Docs
+- Jumpstart https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/
+- Connectivity mode https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity
+
+Next go to Azure Portal and add new *Azure Arc data controller* extension to *Kubernetes - Azure Arc*
+- data controller name - jjrancherdata
+- new custom location - jjrancherloc
+- kubernetes - configuration template - azure-arc-kubeadm
+- kubernetes - infrastructure - azure
+- kubernetes storage class - local-path
+
+```powershell
+sudo kubectl get crd | grep arcdata
+```
+
+Resize Rancher host to enough resources B20ms.
+
+Now you can create database server
+- MSSQL Managed instance https://docs.microsoft.com/en-us/azure/azure-arc/data/create-sql-managed-instance
+
+Database needs ReadWriteMany storage class for backups - check docs https://docs.microsoft.com/en-us/azure/azure-arc/data/storage-configuration
+
+We will use temporary solution (NFS running on host) https://itnext.io/kubernetes-storage-part-1-nfs-complete-tutorial-75e6ac2a1f77
+
+```bash
+sudo apt-get update
+sudo apt-get install nfs-common nfs-kernel-server -y
+sudo mkdir -p /data/nfs1
+sudo chown nobody:nogroup /data/nfs1
+sudo chmod g+rwxs /data/nfs1
+echo -e "/data/nfs1\t10.0.0.0/8(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
+sudo exportfs -av 
+# restart and show logs
+sudo systemctl restart nfs-kernel-server
+sudo systemctl status nfs-kernel-server
+sudo apt install nfs-common -y
+```
+Now install Storage Class
+
+```bash
+helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
+helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
+  --create-namespace \
+  --namespace nfs-provisioner \
+  --set nfs.server=10.0.0.4 \
+  --set nfs.path=/data/nfs1
+```
+Now you can use Storage Class named: nfs-client
+
+Create MSSQL MI server with Az CLI (max 15 characters)
+
+```powershell
+$rg = "jjrancher-rg"
+az sql mi-arc create `
+    --name jjranchersql --resource-group $rg --location westeurope `
+    -–subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx `
+    --custom-location jjrancherloc --storage-class-backups nfs-client
+```
+
+Install Azure Data Studio https://github.com/microsoft/azuredatastudio#try-out-the-latest-insiders-build-from-main
+
+Install SqlCmd https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-setup-tools?view=sql-server-ver15#ubuntu
+
+Connect https://docs.microsoft.com/en-us/azure/azure-arc/data/connect-managed-instance
+
+```bash
+/opt/mssql-tools/bin/sqlcmd -S 10.0.0.4,31233 -U jj
+```
