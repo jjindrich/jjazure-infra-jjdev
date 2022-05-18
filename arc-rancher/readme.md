@@ -106,6 +106,8 @@ Next go to Azure Portal and add new *Azure Arc data controller* extension to *Ku
 sudo kubectl get crd | grep arcdata
 ```
 
+![Azure Arc data controller](media/datacontroller.png)
+
 Resize Rancher host to enough resources B20ms.
 
 Now you can create database server
@@ -131,6 +133,8 @@ sudo apt install nfs-common -y
 Now install Storage Class
 
 ```bash
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
 helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
 helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
   --create-namespace \
@@ -150,12 +154,27 @@ az sql mi-arc create `
     --custom-location jjrancherloc --storage-class-backups nfs-client
 ```
 
+![MSSQL MI](media/sqlmi-azure.png)
+
 Install Azure Data Studio https://github.com/microsoft/azuredatastudio#try-out-the-latest-insiders-build-from-main
 
 Install SqlCmd https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-setup-tools?view=sql-server-ver15#ubuntu
 
 Connect https://docs.microsoft.com/en-us/azure/azure-arc/data/connect-managed-instance
 
+```powershell
+$rg = "jjrancher-rg"
+az network nsg rule create -g $rg `
+    --nsg-name jjrancher-nsg `
+    -n sql `
+    --priority 170 `
+    --source-address-prefixes * `
+    --destination-port-ranges 31233 `
+    --protocol Tcp
+```
+
 ```bash
 /opt/mssql-tools/bin/sqlcmd -S 10.0.0.4,31233 -U jj
 ```
+
+![MSSQL MI connect](media/sqlmi-studio.png)
