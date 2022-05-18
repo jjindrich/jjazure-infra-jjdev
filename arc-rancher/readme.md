@@ -1,12 +1,9 @@
 # Deploy Rancher K3s with Azure Arc and Azure Services
 
-Prepare App registration for adding K3s in Azure Arc - jjrancherk3s
+## Deploy K3s with Azure Arc for kubernetes
 
-## Deploy K3s using jumpstart
-
-Docs https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/rancher_k3s/azure_arm_template/
-
-## Deploy K3s using script
+Docs
+- Jumpstart https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/rancher_k3s/azure_arm_template/
 
 Create VM
 
@@ -59,9 +56,27 @@ az connectedk8s show -g jjrancher-rg -n jjrancher --query provisioningState   # 
 
 Now you will see Azure Arc for Kubernetes resource for jjrancher in Azure Portal.
 
+### Configure Cluster Connect
+
+Docs
+- https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/cluster-connect#service-account-token-authentication-option
+
+Connect to K8s cluster
+
+```bash
+kubectl create serviceaccount admin-user
+kubectl create clusterrolebinding admin-user-binding --clusterrole cluster-admin --serviceaccount default:admin-user
+SECRET_NAME=$(kubectl get serviceaccount admin-user -o jsonpath='{$.secrets[0].name}')
+TOKEN=$(kubectl get secret ${SECRET_NAME} -o jsonpath='{$.data.token}' | base64 -d | sed $'s/$/\\\n/g')
+echo $TOKEN
+```
+
+Copy token and past into Azure portal in Kubernetes resources blades.
+
 ## Deploy App Service extension
 
-Docs https://docs.microsoft.com/en-us/Azure/app-service/manage-create-arc-environment
+Docs
+- App Services https://docs.microsoft.com/en-us/Azure/app-service/manage-create-arc-environment
 
 Custom location docs https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations
 
@@ -108,7 +123,7 @@ sudo kubectl get crd | grep arcdata
 
 ![Azure Arc data controller](media/datacontroller.png)
 
-Resize Rancher host to enough resources B20ms.
+Resize Rancher host to enough resources B20ms and SSD Premium disk.
 
 Now you can create database server
 - MSSQL Managed instance https://docs.microsoft.com/en-us/azure/azure-arc/data/create-sql-managed-instance
