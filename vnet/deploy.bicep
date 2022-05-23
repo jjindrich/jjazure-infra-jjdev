@@ -3,10 +3,11 @@ param vnetAppName string = 'JJDevV2NetworkApp'
 param publicIpPrefixName string = 'jjdevv2network-pip'
 param vpnGwName string = 'jjdevv2vpngw'
 param bastionName string = 'jjdevv2bastion'
+param location string = resourceGroup().location
 
 resource publicIpPrefix 'Microsoft.Network/publicIPPrefixes@2019-11-01' = {
   name: publicIpPrefixName
-  location: resourceGroup().location
+  location: location
   sku: {
     name: 'Standard'
   }
@@ -21,7 +22,7 @@ resource publicIpPrefix 'Microsoft.Network/publicIPPrefixes@2019-11-01' = {
 */
 resource nsgDmzInfra 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
   name: '${vnetHubName}-DmzInfra'
-  location: resourceGroup().location
+  location: location
   properties: {
     securityRules: [
       {
@@ -65,7 +66,7 @@ resource nsgDmzInfra 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
 
 resource nsgAppGwSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
   name: '${vnetHubName}-AppGwSubnet'
-  location: resourceGroup().location
+  location: location
   properties: {
     securityRules: [
       {
@@ -127,7 +128,7 @@ resource nsgAppGwSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
 
 resource nsgApiMngmtSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
   name: '${vnetHubName}-ApiMngmtSubnet'
-  location: resourceGroup().location
+  location: location
   properties: {
     securityRules: [
       {
@@ -153,7 +154,7 @@ resource nsgApiMngmtSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' 
 
 resource nsgBastionSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
   name: '${vnetHubName}-BastionSubnet'
-  location: resourceGroup().location
+  location: location
   properties: {
     securityRules: [
       {
@@ -247,18 +248,15 @@ resource nsgBastionSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' =
 
 resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: vnetHubName
-  location: resourceGroup().location
+  location: location
   properties: {
     addressSpace: {
       addressPrefixes: [
         '10.3.0.0/16'
-        'acd:acd::/45'
       ]
     }
     dhcpOptions: {
-      dnsServers: [
-        '10.3.250.10'
-      ]
+      dnsServers: []
     }
     subnets: [
       {
@@ -274,10 +272,7 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
       {
         name: 'DmzInfra'
         properties: {
-          addressPrefixes: [
-            '10.3.250.0/24'
-            'acd:acd::/64'
-          ]
+          addressPrefix: '10.3.250.0/24'
           networkSecurityGroup: {
             id: nsgDmzInfra.id
           }
@@ -336,6 +331,40 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
           privateLinkServiceNetworkPolicies: 'Enabled'
         }
       }
+      {
+        name: 'DmzDns-In'
+        properties: {
+          addressPrefix: '10.3.254.128/28'
+          serviceEndpoints: []
+          delegations: [
+            {
+              name: 'Microsoft.Network.dnsResolvers'
+              properties: {
+                serviceName: 'Microsoft.Network/dnsResolvers'
+              }
+            }
+          ]
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+        }
+      }
+      {
+        name: 'DmzDns-Out'
+        properties: {
+          addressPrefix: '10.3.254.144/28'
+          serviceEndpoints: []
+          delegations: [
+            {
+              name: 'Microsoft.Network.dnsResolvers'
+              properties: {
+                serviceName: 'Microsoft.Network/dnsResolvers'
+              }
+            }
+          ]
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+        }
+      }
     ]
     enableDdosProtection: false
     enableVmProtection: false
@@ -361,18 +390,98 @@ resource vnetHub_to_vnetApp 'Microsoft.Network/virtualNetworks/virtualNetworkPee
 }
 
 /*
+******** DNS Resolver as DNS server *******
+  - for spoke as DNS server
+  - configured forwarding to Windows AD server 
+*/
+resource vnetDnsResolver 'Microsoft.Network/dnsResolvers@2020-04-01-preview' = {
+  name: '${vnetHubName}-dnsresolver'
+  location: location
+  properties:{
+    virtualNetwork: {
+      id: vnetHub.id
+    }    
+  }
+}
+
+resource subnetDnsIn 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' existing = {
+  parent: vnetHub
+  name: 'DmzDns-In'
+}
+resource vnetDnsResolverIn 'Microsoft.Network/dnsResolvers/inboundEndpoints@2020-04-01-preview' = {
+  parent: vnetDnsResolver
+  name: '${vnetHubName}-dnsresolver-in'
+  location: location
+  properties: {
+    ipConfigurations: [
+      {
+        subnet: {
+          id: subnetDnsIn.id
+        }        
+      }
+    ]
+  }
+}
+
+resource subnetDnsOut 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' existing = {
+  parent: vnetHub
+  name: 'DmzDns-Out'
+}
+resource vnetDnsResolverOut 'Microsoft.Network/dnsResolvers/outboundEndpoints@2020-04-01-preview' = {
+  parent: vnetDnsResolver
+  name: '${vnetHubName}-dnsresolver-out'
+  location: location
+  properties: {
+    subnet: {
+      id: subnetDnsOut.id
+    }
+  }
+}
+
+resource vnetDnsFwdRuleSet 'Microsoft.Network/dnsForwardingRulesets@2020-04-01-preview' = {
+  name: '${vnetHubName}-dnsfwd'
+  location: location
+  properties: {
+    dnsResolverOutboundEndpoints: [
+      {
+        id: vnetDnsResolverOut.id
+      }
+    ]
+  }
+}
+resource vnetDnsResolverForwarding 'Microsoft.Network/dnsForwardingRulesets/forwardingRules@2020-04-01-preview' = {
+  name: '${vnetHubName}-dnsfwd-jjdevorg'  
+  parent: vnetDnsFwdRuleSet
+  properties: {
+    domainName: 'jjdev.org.'
+    targetDnsServers: [
+      {
+        ipAddress: '10.3.250.10'
+      }
+    ]
+    forwardingRuleState: 'Enabled'
+  }
+}
+resource vnetDnsResolverForwardingLink 'Microsoft.Network/dnsForwardingRulesets/virtualNetworkLinks@2020-04-01-preview' = {
+  name: '${vnetHubName}-dnsfwd-link-hub'  
+  parent: vnetDnsFwdRuleSet
+  properties: {
+    virtualNetwork: {
+      id: vnetHub.id
+    }
+  }
+}
+
+/*
 ******** HUB VPN Gateway with connection JJDevBR1 *******
 */
-resource subnetVpnGw 'Microsoft.Network/virtualNetworks/subnets@2020-05-01' = {
+resource subnetVpnGw 'Microsoft.Network/virtualNetworks/subnets@2020-05-01' existing = {
   parent: vnetHub
   name: 'GatewaySubnet'
-  properties: {
-    addressPrefix: '10.3.0.0/27'
-  }
 }
 resource ipVpnGw 'Microsoft.Network/publicIPAddresses@2021-05-01' = {
   name: '${vpnGwName}-ip'
-  location: resourceGroup().location
+  location: location
   sku: {
     name: 'Standard'
     tier: 'Regional'
@@ -394,7 +503,7 @@ resource ipVpnGw 'Microsoft.Network/publicIPAddresses@2021-05-01' = {
 }
 resource vpnGw 'Microsoft.Network/virtualNetworkGateways@2021-05-01' = {
   name: vpnGwName
-  location: resourceGroup().location
+  location: location
   properties: {
     sku: {
       name: 'VpnGw1AZ'
@@ -424,7 +533,7 @@ resource vpnGw 'Microsoft.Network/virtualNetworkGateways@2021-05-01' = {
 }
 resource localVpnSite 'Microsoft.Network/localNetworkGateways@2021-05-01' = {
   name: 'JJDevBR1'
-  location: resourceGroup().location
+  location: location
   properties:{
     gatewayIpAddress: '194.213.40.56'
     bgpSettings: {
@@ -440,7 +549,7 @@ resource localVpnSite 'Microsoft.Network/localNetworkGateways@2021-05-01' = {
 }
 resource connVpn 'Microsoft.Network/connections@2021-05-01' = {
   name: 'JJDevBR1-to-${vpnGwName}'
-  location: resourceGroup().location
+  location: location
   properties: {
     connectionType: 'IPsec'
     connectionProtocol: 'IKEv2'
@@ -462,7 +571,7 @@ resource connVpn 'Microsoft.Network/connections@2021-05-01' = {
 */
 resource nsgAppDefault 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
   name: '${vnetAppName}-Default'
-  location: resourceGroup().location
+  location: location
   properties: {
     securityRules: []
   }
@@ -470,7 +579,7 @@ resource nsgAppDefault 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
 
 resource nsgAppAks 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
   name: '${vnetAppName}-AKS'
-  location: resourceGroup().location
+  location: location
   properties: {
     securityRules: [
       {
@@ -513,7 +622,7 @@ resource nsgAppAks 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
 
 resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: vnetAppName
-  location: resourceGroup().location
+  location: location
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -522,7 +631,7 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
     }
     dhcpOptions: {
       dnsServers: [
-        '10.3.250.10'
+        vnetDnsResolverIn.properties.ipConfigurations[0].privateIpAddress
       ]
     }
     subnets: [
@@ -667,7 +776,7 @@ resource vnetApp_to_vnetHub 'Microsoft.Network/virtualNetworks/virtualNetworkPee
 */
 resource ipBastion 'Microsoft.Network/publicIPAddresses@2021-05-01' = {
   name: '${bastionName}-ip'
-  location: resourceGroup().location
+  location: location
   sku: {
     name: 'Standard'
     tier: 'Regional'
@@ -696,7 +805,7 @@ resource subnetBastion 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = 
 }
 resource bastion 'Microsoft.Network/bastionHosts@2021-05-01' = {
   name: bastionName
-  location: resourceGroup().location
+  location: location
   sku: {
     name: 'Standard'
   }
