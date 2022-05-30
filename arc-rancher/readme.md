@@ -118,7 +118,17 @@ Next go to Azure Portal and add new *API Management gateway* extension to *Kuber
 - service type - LoadBalancer
 - ports - default (http 8080, https 8081)
 
-Now you can check API Management gateways to see Selfhosted gateway is up-to-running. Next assign API (e.g. Echo API) to this gateway. Check API design blade which Gateways are associated.
+Now you can check API Management gateways to see Selfhosted gateway is up-to-running. 
+
+Next assign API (e.g. Echo API) to this gateway
+- check API design blade which Gateways are associated
+- check URL scheme on API settings blade
+
+![Azure API management definiton](media/api-definition.png)
+
+Get IP address of published Selfhosted gateway (kubectl get services -A) and call it.
+
+![Azure API management](media/api-call.png)
 
 ## Deploy Data controller extension
 
