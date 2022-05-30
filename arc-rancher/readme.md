@@ -104,6 +104,22 @@ az network nsg rule create -g $rg `
 
 Now you can deploy Azure Functions / Web App into Region jjrancherloc.
 
+## Deploy API Management gateway extension
+
+Docs
+- https://docs.microsoft.com/en-us/azure/api-management/how-to-deploy-self-hosted-gateway-azure-arc
+
+Create new API management service first.
+
+Next go to Azure Portal and add new *API Management gateway* extension to *Kubernetes - Azure Arc*
+- select resource group with provisioned API Management service
+- new Gateway name - jjrancherapi
+- namespace - jjrancher
+- service type - LoadBalancer
+- ports - default (http 8080, https 8081)
+
+Now you can check API Management gateways to see Selfhosted gateway is up-to-running. Next assign API (e.g. Echo API) to this gateway. Check API design blade which Gateways are associated.
+
 ## Deploy Data controller extension
 
 Docs
