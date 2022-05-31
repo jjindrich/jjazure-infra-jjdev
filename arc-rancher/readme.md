@@ -85,7 +85,6 @@ Next go to Azure Portal and add new *Application Services* extension to *Kuberne
 - new custom location - jjrancherloc
 - static IP - VM public ip
 - storage class - local-path
-- And copy script and run it 
 
 Now you can see Custom location jjrancherloc and App Service Kubernetes Environment resource using this custom location.
 
