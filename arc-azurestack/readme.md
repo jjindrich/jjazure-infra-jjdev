@@ -25,7 +25,7 @@ Register Windows Admin Center
 ## Deploy AzureStack HCI cluster with Arc
 
 Lab scripts
-- https://github.com/microsoft/MSLab/tree/dev/Scenarios/AzSHCI%20and%20Arc-enabled%20VMs
+- https://github.com/microsoft/MSLab/tree/master/Scenarios/AzSHCI%20and%20Arc-enabled%20VMs
 
 Steps in script
 - create HCI cluster
@@ -37,3 +37,13 @@ Steps in script
 Logon into DC virtual machine 
 - run script Scenario.ps1 - step by step run regions under administrator rights
 - test to connect jjazscluster
+
+![AzureStack HCI](media/hci.png)
+
+![Azure Arc resource bridge](media/arc-bridge.png)
+
+![Azure Arc VM create](media/arc-vm-create.png)
+
+![Azure Arc VM](media/arc-vm.png)
+
+![AzureStack HCI Admin Center](media/hci-admincenter.png)
