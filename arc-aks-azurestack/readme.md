@@ -34,10 +34,23 @@ Steps in script
 Logon into DC virtual machine 
 - run script Scenario.ps1 - step by step run regions under administrator rights
 - test to connect jjazsakscluster
+- VMs running in 10.0.0.0/24 (installed DHCP server with scope 10.0.0.0/24)
 
-Next go to create AKS cluster
-- connect to cluster and using Windows Admin Center create AKS cluster 
-    - IP allocation - Static (subnet 10.0.1.0/24, gw 10.0.1.1, dns 10.0.1.1)
-    - Kubernetes nodepool - from 10.0.1.101 to 10.0.1.254
-    - Virtual IP pool - from 10.0.1.2 to 10.0.1.100
+Next go to create AKS cluster (connect to cluster and using Windows Admin Center)
+- create cluster storage AKS 1 TB
+- make sure VM have available cores and 30 GB RAM
+- create AKS (aks management)
+    - IP allocation - Static (subnet 10.0.0.0/24, gw 10.0.0.1, dns 10.0.0.1)
+    - Kubernetes nodepool - from 10.0.0.101 to 10.0.0.254
+    - Virtual IP pool - from 10.0.0.50 to 10.0.0.100
+- create AKS cluster (aks workload)
+    - define loadbalancer, nodepool sizing and networking options
 
+![AzureStack HCI AKS](media/aks-create.png)
+![AzureStack HCI AKS](media/aks-created.png)
+
+![AzureStack HCI AKS](media/aks-cluster01.png)
+
+![AzureStack HCI cluster](media/hci-cluster.png)
+
+![Azure Portal](media/portal.png)
