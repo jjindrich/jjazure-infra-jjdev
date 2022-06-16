@@ -36,6 +36,10 @@ Logon into DC virtual machine
 - test to connect jjazsakscluster
 - VMs running in 10.0.0.0/24 (installed DHCP server with scope 10.0.0.0/24)
 
+Docs
+- https://docs.microsoft.com/en-us/azure-stack/aks-hci/
+- https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-concepts
+
 Next go to create AKS cluster (connect to cluster and using Windows Admin Center)
 - create cluster storage AKS 1 TB
 - make sure VM have available cores and 30 GB RAM
@@ -54,3 +58,9 @@ Next go to create AKS cluster (connect to cluster and using Windows Admin Center
 ![AzureStack HCI cluster](media/hci-cluster.png)
 
 ![Azure Portal](media/portal.png)
+
+Now you can work with AKS
+- download kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/#install-kubectl-binary-with-curl-on-windows
+- download cluster kubeconfig from Windows Admin Center and move it into .kube/config file
+
+![App running on AKS](media/app.png)
