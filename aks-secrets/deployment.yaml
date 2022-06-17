@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jjnginx
+spec:
+  selector:
+    matchLabels:
+      app: jjnginx
+  template:
+    metadata:
+      labels:
+        app: jjnginx
+    spec:
+      containers:
+      - name: jjnginx
+        image: nginx:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+        env:
+          - name: AKSNAME
+            valueFrom:
+              secretKeyRef:
+                name: aksname
+                key: aksname
+        volumeMounts:
+          - name: secrets-store-inline
+            mountPath: "/mnt/secrets-store"
+            readOnly: true
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "azure-sync"
