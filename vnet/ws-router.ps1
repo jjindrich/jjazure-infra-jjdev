@@ -9,7 +9,7 @@ $BgpPeer = "10.3.0.30" # jjdevv2vpngw bgp ip
 $BgpAsn = "65515" # jjdevv2vpngw bgp asn
 
 # My local site configuration
-$RouterPublicIP = "194.213.40.55"
+$RouterPublicIP = "194.213.40.56"
 $Network = "10.1.0.0/16"
 
 # Create first interface to tunnel 1
