@@ -16,5 +16,11 @@ az aks create -n jjaksudr -g $rgaks `
     --workspace-resource-id $(az monitor log-analytics workspace show -g $rgmonitor -n jjdev-analytics --query id -o tsv) `
     --outbound-type userDefinedRouting
 
+# Assign role Azure Kubernetes Service RBAC Cluster Admin
+# https://docs.microsoft.com/en-us/azure/aks/manage-azure-rbac
+
+az aks get-credentials --resource-group jjmicroservices-rg --name jjaksudr
+
 # Deploy application using intenal loadbalancer
 kubectl apply -f sample-private.yaml
+kubectl get service
