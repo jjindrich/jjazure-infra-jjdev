@@ -1,8 +1,8 @@
-param vnetHubName string = 'JJDevV2Network'
-param vnetAppName string = 'JJDevV2NetworkApp'
-param publicIpPrefixName string = 'jjdevv2network-pip'
-param vpnGwName string = 'jjdevv2vpngw'
-param bastionName string = 'jjdevv2bastion'
+param vnetHubName string = 'jjazhubvnet'
+param vnetAppName string = 'jjazappvnet'
+param publicIpPrefixName string = 'jjaz-pip'
+param vpnGwName string = 'jjazhub-vpngw'
+param bastionName string = 'jjazhub-bastion'
 param location string = resourceGroup().location
 
 resource publicIpPrefix 'Microsoft.Network/publicIPPrefixes@2019-11-01' = {
@@ -21,7 +21,7 @@ resource publicIpPrefix 'Microsoft.Network/publicIPPrefixes@2019-11-01' = {
 ******** HUB NETWORK ********
 */
 resource nsgDmzInfra 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
-  name: '${vnetHubName}-DmzInfra'
+  name: '${vnetHubName}-infra-nsg'
   location: location
   properties: {
     securityRules: [
@@ -42,30 +42,12 @@ resource nsgDmzInfra 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
           destinationAddressPrefixes: []
         }
       }
-      {
-        name: 'AdminCenter-Preview'
-        properties: {
-          protocol: 'Tcp'
-          sourcePortRange: '*'
-          destinationPortRanges: [
-            '6516'
-          ]
-          sourceAddressPrefix: 'Internet'
-          destinationAddressPrefix: 'VirtualNetwork'
-          access: 'Allow'
-          priority: 100
-          direction: 'Inbound'
-          sourcePortRanges: []
-          sourceAddressPrefixes: []
-          destinationAddressPrefixes: []
-        }
-      }
     ]
   }
 }
 
 resource nsgAppGwSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
-  name: '${vnetHubName}-AppGwSubnet'
+  name: '${vnetHubName}-appgw-nsg'
   location: location
   properties: {
     securityRules: [
@@ -127,7 +109,7 @@ resource nsgAppGwSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
 }
 
 resource nsgApiMngmtSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
-  name: '${vnetHubName}-ApiMngmtSubnet'
+  name: '${vnetHubName}-apimngmt-nsg'
   location: location
   properties: {
     securityRules: [
@@ -153,7 +135,7 @@ resource nsgApiMngmtSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' 
 }
 
 resource nsgBastionSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
-  name: '${vnetHubName}-BastionSubnet'
+  name: '${vnetHubName}-bastion-nsg'
   location: location
   properties: {
     securityRules: [
@@ -270,7 +252,7 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
-        name: 'DmzInfra'
+        name: 'infra-snet'
         properties: {
           addressPrefix: '10.3.250.0/24'
           networkSecurityGroup: {
@@ -283,7 +265,7 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
-        name: 'DmzApiMngmt'
+        name: 'apimngmt-snet'
         properties: {
           addressPrefix: '10.3.251.0/24'
           networkSecurityGroup: {
@@ -306,7 +288,7 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
-        name: 'AzureApplicationGatewaySubnet'
+        name: 'appgw-snet'
         properties: {
           addressPrefix: '10.3.253.0/24'
           networkSecurityGroup: {
@@ -332,7 +314,7 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
-        name: 'DmzDns-In'
+        name: 'dnsin-snet'
         properties: {
           addressPrefix: '10.3.254.128/28'
           serviceEndpoints: []
@@ -349,7 +331,7 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
-        name: 'DmzDns-Out'
+        name: 'dnsout-snet'
         properties: {
           addressPrefix: '10.3.254.144/28'
           serviceEndpoints: []
@@ -406,7 +388,7 @@ resource vnetDnsResolver 'Microsoft.Network/dnsResolvers@2020-04-01-preview' = {
 
 resource subnetDnsIn 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' existing = {
   parent: vnetHub
-  name: 'DmzDns-In'
+  name: 'dnsin-snet'
 }
 resource vnetDnsResolverIn 'Microsoft.Network/dnsResolvers/inboundEndpoints@2020-04-01-preview' = {
   parent: vnetDnsResolver
@@ -425,7 +407,7 @@ resource vnetDnsResolverIn 'Microsoft.Network/dnsResolvers/inboundEndpoints@2020
 
 resource subnetDnsOut 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' existing = {
   parent: vnetHub
-  name: 'DmzDns-Out'
+  name: 'dnsout-snet'
 }
 resource vnetDnsResolverOut 'Microsoft.Network/dnsResolvers/outboundEndpoints@2020-04-01-preview' = {
   parent: vnetDnsResolver
@@ -570,7 +552,7 @@ resource connVpn 'Microsoft.Network/connections@2021-05-01' = {
 ******** APP SPOKE NETWORK ********
 */
 resource nsgAppDefault 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
-  name: '${vnetAppName}-Default'
+  name: '${vnetAppName}-default-nsg'
   location: location
   properties: {
     securityRules: []
@@ -578,7 +560,7 @@ resource nsgAppDefault 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
 }
 
 resource nsgAppAks 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
-  name: '${vnetAppName}-AKS'
+  name: '${vnetAppName}-aks-nsg'
   location: location
   properties: {
     securityRules: [
@@ -636,7 +618,7 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
     }
     subnets: [
       {
-        name: 'DmzApp'
+        name: 'app-snet'
         properties: {
           addressPrefix: '10.4.1.0/24'
           networkSecurityGroup: {
@@ -649,7 +631,7 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
-        name: 'DmzAks'
+        name: 'aks-snet'
         properties: {
           addressPrefix: '10.4.2.0/24'
           networkSecurityGroup: {
@@ -662,7 +644,7 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
-        name: 'DmzAksPrivate'
+        name: 'aksprivate-snet'
         properties: {
           addressPrefix: '10.4.3.0/24'
           networkSecurityGroup: {
@@ -675,7 +657,7 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
-        name: 'DmzAse'
+        name: 'ase-snet'
         properties: {
           addressPrefix: '10.4.4.0/24'
           networkSecurityGroup: {
@@ -695,7 +677,7 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
-        name: 'DmzDesktop'
+        name: 'avd-snet'
         properties: {
           addressPrefix: '10.4.10.0/24'
           networkSecurityGroup: {
@@ -708,7 +690,7 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
-        name: 'DmzFunction'
+        name: 'function-snet'
         properties: {
           addressPrefix: '10.4.21.0/24'
           networkSecurityGroup: {
@@ -728,7 +710,7 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
-        name: 'DmzAci'
+        name: 'aci-snet'
         properties: {
           addressPrefix: '10.4.22.0/24'
           networkSecurityGroup: {
