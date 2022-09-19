@@ -432,10 +432,10 @@ resource vnetDnsFwdRuleSet 'Microsoft.Network/dnsForwardingRulesets@2020-04-01-p
   }
 }
 resource vnetDnsResolverForwarding 'Microsoft.Network/dnsForwardingRulesets/forwardingRules@2020-04-01-preview' = {
-  name: '${vnetHubName}-dnsfwd-jjdevorg'  
+  name: '${vnetHubName}-dnsfwd-jjazureorg'  
   parent: vnetDnsFwdRuleSet
   properties: {
-    domainName: 'jjdev.org.'
+    domainName: 'jjazure.org.'
     targetDnsServers: [
       {
         ipAddress: '10.3.250.10'
