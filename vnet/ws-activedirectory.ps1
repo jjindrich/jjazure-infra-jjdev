@@ -6,3 +6,6 @@ Install-WindowsFeature -Name RSAT-AD-AdminCenter
 Import-Module ADDSDeployment
 
 Install-ADDSForest -DomainName "corp.jjazure.org" -DomainNetbiosName "corp"
+
+# dalsi DNS zona
+#   app.jjzure.org

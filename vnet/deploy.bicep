@@ -373,10 +373,8 @@ resource vnetHub_to_vnetApp 'Microsoft.Network/virtualNetworks/virtualNetworkPee
 
 /*
 ******** DNS Resolver as DNS server *******
-  - for spoke as DNS server
-  - configured forwarding to Windows AD server 
 */
-resource vnetDnsResolver 'Microsoft.Network/dnsResolvers@2020-04-01-preview' = {
+resource vnetDnsResolver 'Microsoft.Network/dnsResolvers@2022-07-01' = {
   name: '${vnetHubName}-dnsresolver'
   location: location
   properties:{
@@ -386,30 +384,30 @@ resource vnetDnsResolver 'Microsoft.Network/dnsResolvers@2020-04-01-preview' = {
   }
 }
 
-resource subnetDnsIn 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' existing = {
-  parent: vnetHub
-  name: 'dnsin-snet'
-}
-resource vnetDnsResolverIn 'Microsoft.Network/dnsResolvers/inboundEndpoints@2020-04-01-preview' = {
-  parent: vnetDnsResolver
-  name: '${vnetHubName}-dnsresolver-in'
-  location: location
-  properties: {
-    ipConfigurations: [
-      {
-        subnet: {
-          id: subnetDnsIn.id
-        }        
-      }
-    ]
-  }
-}
+// resource subnetDnsIn 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' existing = {
+//   parent: vnetHub
+//   name: 'dnsin-snet'
+// }
+// resource vnetDnsResolverIn 'Microsoft.Network/dnsResolvers/inboundEndpoints@2022-07-01' = {
+//   parent: vnetDnsResolver
+//   name: '${vnetHubName}-dnsresolver-in'
+//   location: location
+//   properties: {
+//     ipConfigurations: [
+//       {
+//         subnet: {
+//           id: subnetDnsIn.id
+//         }        
+//       }
+//     ]
+//   }
+// }
 
 resource subnetDnsOut 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' existing = {
   parent: vnetHub
   name: 'dnsout-snet'
 }
-resource vnetDnsResolverOut 'Microsoft.Network/dnsResolvers/outboundEndpoints@2020-04-01-preview' = {
+resource vnetDnsResolverOut 'Microsoft.Network/dnsResolvers/outboundEndpoints@2022-07-01' = {
   parent: vnetDnsResolver
   name: '${vnetHubName}-dnsresolver-out'
   location: location
@@ -420,7 +418,7 @@ resource vnetDnsResolverOut 'Microsoft.Network/dnsResolvers/outboundEndpoints@20
   }
 }
 
-resource vnetDnsFwdRuleSet 'Microsoft.Network/dnsForwardingRulesets@2020-04-01-preview' = {
+resource vnetDnsFwdRuleSet 'Microsoft.Network/dnsForwardingRulesets@2022-07-01' = {
   name: '${vnetHubName}-dnsfwd'
   location: location
   properties: {
@@ -431,11 +429,11 @@ resource vnetDnsFwdRuleSet 'Microsoft.Network/dnsForwardingRulesets@2020-04-01-p
     ]
   }
 }
-resource vnetDnsResolverForwarding 'Microsoft.Network/dnsForwardingRulesets/forwardingRules@2020-04-01-preview' = {
-  name: '${vnetHubName}-dnsfwd-jjazureorg'  
+resource vnetDnsResolverForwarding1 'Microsoft.Network/dnsForwardingRulesets/forwardingRules@2022-07-01' = {
+  name: '${vnetHubName}-dnsfwd-appjjazureorg'  
   parent: vnetDnsFwdRuleSet
   properties: {
-    domainName: 'jjazure.org.'
+    domainName: 'app.jjazure.org.'
     targetDnsServers: [
       {
         ipAddress: '10.3.250.10'
@@ -444,12 +442,47 @@ resource vnetDnsResolverForwarding 'Microsoft.Network/dnsForwardingRulesets/forw
     forwardingRuleState: 'Enabled'
   }
 }
-resource vnetDnsResolverForwardingLink 'Microsoft.Network/dnsForwardingRulesets/virtualNetworkLinks@2020-04-01-preview' = {
+resource vnetDnsResolverForwarding2 'Microsoft.Network/dnsForwardingRulesets/forwardingRules@2022-07-01' = {
+  name: '${vnetHubName}-dnsfwd-corpjjazureorg'  
+  parent: vnetDnsFwdRuleSet
+  properties: {
+    domainName: 'corp.jjazure.org.'
+    targetDnsServers: [
+      {
+        ipAddress: '10.3.250.10'
+      }
+    ]
+    forwardingRuleState: 'Enabled'
+  }
+}
+resource vnetDnsResolverForwarding3 'Microsoft.Network/dnsForwardingRulesets/forwardingRules@2022-07-01' = {
+  name: '${vnetHubName}-dnsfwd-jjbr1jjazureorg'  
+  parent: vnetDnsFwdRuleSet
+  properties: {
+    domainName: 'jjbr1.jjazure.org.'
+    targetDnsServers: [
+      {
+        ipAddress: '10.1.0.10'
+      }
+    ]
+    forwardingRuleState: 'Enabled'
+  }
+}
+resource vnetDnsResolverForwardingLinkHub 'Microsoft.Network/dnsForwardingRulesets/virtualNetworkLinks@2022-07-01' = {
   name: '${vnetHubName}-dnsfwd-link-hub'  
   parent: vnetDnsFwdRuleSet
   properties: {
     virtualNetwork: {
       id: vnetHub.id
+    }
+  }
+}
+resource vnetDnsResolverForwardingLinkApp 'Microsoft.Network/dnsForwardingRulesets/virtualNetworkLinks@2022-07-01' = {
+  name: '${vnetHubName}-dnsfwd-link-app'  
+  parent: vnetDnsFwdRuleSet
+  properties: {
+    virtualNetwork: {
+      id: vnetApp.id
     }
   }
 }
@@ -611,11 +644,11 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         '10.4.0.0/16'
       ]
     }
-    dhcpOptions: {
-      dnsServers: [
-        vnetDnsResolverIn.properties.ipConfigurations[0].privateIpAddress
-      ]
-    }
+    // dhcpOptions: {
+    //   dnsServers: [
+    //     vnetDnsResolverIn.properties.ipConfigurations[0].privateIpAddress
+    //   ]
+    // }
     subnets: [
       {
         name: 'app-snet'
@@ -725,6 +758,19 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
               }
             }
           ]
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+        }
+      }
+      {
+        name: 'aca-snet'
+        properties: {
+          addressPrefix: '10.4.6.0/23'
+          networkSecurityGroup: {
+            id: nsgAppDefault.id
+          }
+          serviceEndpoints: []
+          delegations: []
           privateEndpointNetworkPolicies: 'Enabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
         }
