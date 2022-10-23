@@ -74,6 +74,17 @@ resource vmad 'Microsoft.Compute/virtualMachines@2021-04-01' = {
       bootDiagnostics: {
         enabled: true
       }
-    }
-  }
+    }  
+  }  
 }
+
+// resource vmadrun 'Microsoft.Compute/virtualMachines/runCommands@2022-03-01' = {
+//   parent: vmad
+//   name: 'runad'
+//   location: location
+//   properties:{
+//     source:{
+//       script: 'New-Item -itemType Directory -Path C:\\ -Name jj'
+//     }
+//   }
+// }
