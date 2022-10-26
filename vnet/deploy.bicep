@@ -228,6 +228,14 @@ resource nsgBastionSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' =
   }
 }
 
+resource nsgDefaultSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
+  name: '${vnetHubName}-default-nsg'
+  location: location
+  properties: {
+    securityRules: []
+  }
+}
+
 resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: vnetHubName
   location: location
@@ -317,6 +325,9 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         name: 'dnsin-snet'
         properties: {
           addressPrefix: '10.3.254.128/28'
+          networkSecurityGroup: {
+            id: nsgDefaultSubnet.id
+          }
           serviceEndpoints: []
           delegations: [
             {
@@ -334,6 +345,9 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         name: 'dnsout-snet'
         properties: {
           addressPrefix: '10.3.254.144/28'
+          networkSecurityGroup: {
+            id: nsgDefaultSubnet.id
+          }
           serviceEndpoints: []
           delegations: [
             {
@@ -644,11 +658,6 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         '10.4.0.0/16'
       ]
     }
-    // dhcpOptions: {
-    //   dnsServers: [
-    //     vnetDnsResolverIn.properties.ipConfigurations[0].privateIpAddress
-    //   ]
-    // }
     subnets: [
       {
         name: 'app-snet'

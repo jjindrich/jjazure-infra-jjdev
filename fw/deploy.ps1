@@ -14,3 +14,5 @@ az network vnet subnet update -g $rg -n app-snet --vnet-name jjazappvnet --route
 az network vnet subnet update -g $rg -n avd-snet --vnet-name jjazappvnet --route-table jjazappvnet-default-rt
 az network vnet subnet update -g $rg -n function-snet --vnet-name jjazappvnet --route-table jjazappvnet-default-rt
 az network vnet subnet update -g $rg -n ase-snet --vnet-name jjazappvnet --route-table jjazappvnet-default-rt
+
+# add route into onprem

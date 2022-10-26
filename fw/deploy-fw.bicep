@@ -99,6 +99,10 @@ resource fwPolicy 'Microsoft.Network/firewallPolicies@2021-02-01' = {
     sku: {
       tier: fwTier
     }
+    dnsSettings: {
+      enableProxy: true
+      servers: []
+    }
   }
 }
 
@@ -272,25 +276,6 @@ resource fwPolicyRule 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2
               '389'
               '88'
               '135'
-            ]
-          }
-          {
-            ruleType: 'NetworkRule'
-            name: 'DNSresponse'
-            ipProtocols: [
-              'UDP'
-            ]
-            sourceAddresses: [
-              '10.3.250.10'
-            ]
-            sourceIpGroups: []
-            destinationAddresses: [
-              '*'
-            ]
-            destinationIpGroups: []
-            destinationFqdns: []
-            destinationPorts: [
-              '*'
             ]
           }
           {
