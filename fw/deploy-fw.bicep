@@ -1,9 +1,9 @@
-param fwName string = 'jjdevv2fw'
+param fwName string = 'jjazfw'
 param fwTier string = 'Premium' // Standard or Premium
 param location string = 'westeurope'
 
-param virtualNetworkName string = 'JJDevV2Network'
-param publicIpPrefix string = 'jjdevv2network-pip'
+param virtualNetworkName string = 'jjazhubvnet'
+param publicIpPrefix string = 'jjaz-pip'
 
 // reference existing network resources
 resource fwVnet 'Microsoft.Network/virtualNetworks@2021-02-01' existing = {
@@ -93,7 +93,7 @@ resource fw 'Microsoft.Network/azureFirewalls@2021-02-01' = {
 }
 
 resource fwPolicy 'Microsoft.Network/firewallPolicies@2021-02-01' = {
-  name: '${fwName}policy'
+  name: '${fwName}-policy'
   location: location
   properties: {
     sku: {
@@ -1176,7 +1176,7 @@ resource fwPolicyRule2 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@
 // --- Route tables       ---
 // --------------------------
 resource routeTablesNameInfra 'Microsoft.Network/routeTables@2019-07-01' = {
-  name: 'jjdevv2fw-hubinfra-rt'
+  name: 'jjazhubvnet-infra-rt'
   location: location
   properties: {
     disableBgpRoutePropagation: false
@@ -1190,7 +1190,7 @@ resource routeTablesNameInfra 'Microsoft.Network/routeTables@2019-07-01' = {
         }
       }
       {
-        name: 'JJDEVBR1toFw'
+        name: 'JJBR1toFw'
         properties: {
           addressPrefix: '10.1.0.0/16'
           nextHopType: 'VirtualAppliance'
@@ -1206,7 +1206,7 @@ resource routeTablesNameInfra 'Microsoft.Network/routeTables@2019-07-01' = {
         }
       }
       {
-        name: 'HubDmzAppgwtToFw'
+        name: 'HubAppgwtToFw'
         properties: {
           addressPrefix: '10.3.253.0/24'
           nextHopType: 'VirtualAppliance'
@@ -1226,7 +1226,7 @@ resource routeTablesNameInfra 'Microsoft.Network/routeTables@2019-07-01' = {
 }
 
 resource routeTablesNameVpn 'Microsoft.Network/routeTables@2019-07-01' = {
-  name: 'jjdevv2fw-hubvpn-rt'
+  name: 'jjazhubvnet-vpn-rt'
   location: location
   properties: {
     disableBgpRoutePropagation: false
@@ -1259,13 +1259,13 @@ resource routeTablesNameVpn 'Microsoft.Network/routeTables@2019-07-01' = {
 }
 
 resource routeTablesNameAppGw 'Microsoft.Network/routeTables@2019-07-01' = {
-  name: 'jjdevv2fw-hubappgw-rt'
+  name: 'jjazhubvnet-appgw-rt'
   location: location
   properties: {
     disableBgpRoutePropagation: false
     routes: [
       {
-        name: 'JJDEVBR1toFw'
+        name: 'JJBR1toFw'
         properties: {
           addressPrefix: '10.1.0.0/16'
           nextHopType: 'VirtualAppliance'
@@ -1281,7 +1281,7 @@ resource routeTablesNameAppGw 'Microsoft.Network/routeTables@2019-07-01' = {
         }
       }
       {
-        name: 'HubDmzInfraToFw'
+        name: 'HubInfraToFw'
         properties: {
           addressPrefix: '10.3.250.0/24'
           nextHopType: 'VirtualAppliance'
@@ -1301,7 +1301,7 @@ resource routeTablesNameAppGw 'Microsoft.Network/routeTables@2019-07-01' = {
 }
 
 resource routeTablesNameApiMngmt 'Microsoft.Network/routeTables@2019-07-01' = {
-  name: 'jjdevv2fw-hubapimngmt-rt'
+  name: 'jjazhubvnet-apimngmt-rt'
   location: location
   properties: {
     disableBgpRoutePropagation: false
@@ -1315,7 +1315,7 @@ resource routeTablesNameApiMngmt 'Microsoft.Network/routeTables@2019-07-01' = {
         }
       }
       {
-        name: 'HubDmzInfraToFw'
+        name: 'HubInfraToFw'
         properties: {
           addressPrefix: '10.3.250.0/24'
           nextHopType: 'VirtualAppliance'
@@ -1323,7 +1323,7 @@ resource routeTablesNameApiMngmt 'Microsoft.Network/routeTables@2019-07-01' = {
         }
       }
       {
-        name: 'HubDmzAppgwtToFw'
+        name: 'HubAppgwtToFw'
         properties: {
           addressPrefix: '10.3.253.0/24'
           nextHopType: 'VirtualAppliance'
@@ -1335,7 +1335,7 @@ resource routeTablesNameApiMngmt 'Microsoft.Network/routeTables@2019-07-01' = {
 }
 
 resource routeTablesNameSpokeApp 'Microsoft.Network/routeTables@2019-07-01' = {
-  name: 'jjdevv2fw-spokeapp-rt'
+  name: 'jjazappvnet-default-rt'
   location: location
   properties: {
     disableBgpRoutePropagation: false
@@ -1349,7 +1349,7 @@ resource routeTablesNameSpokeApp 'Microsoft.Network/routeTables@2019-07-01' = {
         }
       }
       {
-        name: 'HubDmzAppgwtToFw'
+        name: 'HubAppgwtToFw'
         properties: {
           addressPrefix: '10.3.253.0/24'
           nextHopType: 'VirtualAppliance'
@@ -1357,7 +1357,7 @@ resource routeTablesNameSpokeApp 'Microsoft.Network/routeTables@2019-07-01' = {
         }
       }
       {
-        name: 'HubDmzInfraToFw'
+        name: 'HubInfraToFw'
         properties: {
           addressPrefix: '10.3.250.0/24'
           nextHopType: 'VirtualAppliance'

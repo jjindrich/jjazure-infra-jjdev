@@ -1,14 +1,16 @@
-$rg ='JJDevV2-Infra'
+$rg ='jjnetwork-rg'
 
 # install firewall and add routes
 az deployment group create -g $rg --template-file deploy-fw.bicep
 
-az network vnet subnet update -g $rg -n DmzInfra --vnet-name JJDevV2Network --route-table jjdevv2fw-hubinfra-rt
-az network vnet subnet update -g $rg -n DmzAks --vnet-name JJDevV2NetworkApp --route-table jjdevv2fw-spokeapp-rt
-az network vnet subnet update -g $rg -n DmzAksPrivate --vnet-name JJDevV2NetworkApp --route-table jjdevv2fw-spokeapp-rt
-az network vnet subnet update -g $rg -n DmzApp --vnet-name JJDevV2NetworkApp --route-table jjdevv2fw-spokeapp-rt
-az network vnet subnet update -g $rg -n DmzFunction --vnet-name JJDevV2NetworkApp --route-table jjdevv2fw-spokeapp-rt
-az network vnet subnet update -g $rg -n DmzAse --vnet-name JJDevV2NetworkApp --route-table jjdevv2fw-spokeapp-rt
-az network vnet subnet update -g $rg -n GatewaySubnet --vnet-name JJDevV2Network --route-table jjdevv2fw-hubvpn-rt
-az network vnet subnet update -g $rg -n AzureApplicationGatewaySubnet --vnet-name JJDevV2Network --route-table jjdevv2fw-hubappgw-rt
-az network vnet subnet update -g $rg -n DmzApiMngmt --vnet-name JJDevV2Network --route-table jjdevv2fw-hubapimngmt-rt
+az network vnet subnet update -g $rg -n infra-snet --vnet-name jjazhubvnet --route-table jjazhubvnet-infra-rt
+az network vnet subnet update -g $rg -n GatewaySubnet --vnet-name jjazhubvnet --route-table jjazhubvnet-vpn-rt
+az network vnet subnet update -g $rg -n appgw-snet --vnet-name jjazhubvnet --route-table jjazhubvnet-appgw-rt
+az network vnet subnet update -g $rg -n apimngmt-snet --vnet-name jjazhubvnet --route-table jjazhubvnet-apimngmt-rt
+
+az network vnet subnet update -g $rg -n aks-snet --vnet-name jjazappvnet --route-table jjazappvnet-default-rt
+az network vnet subnet update -g $rg -n aksprivate-snet --vnet-name jjazappvnet --route-table jjazappvnet-default-rt
+az network vnet subnet update -g $rg -n app-snet --vnet-name jjazappvnet --route-table jjazappvnet-default-rt
+az network vnet subnet update -g $rg -n avd-snet --vnet-name jjazappvnet --route-table jjazappvnet-default-rt
+az network vnet subnet update -g $rg -n function-snet --vnet-name jjazappvnet --route-table jjazappvnet-default-rt
+az network vnet subnet update -g $rg -n ase-snet --vnet-name jjazappvnet --route-table jjazappvnet-default-rt
