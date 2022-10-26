@@ -1183,6 +1183,14 @@ resource routeTablesNameInfra 'Microsoft.Network/routeTables@2019-07-01' = {
         }
       }
       {
+        name: 'JJBR1toFw-router'
+        properties: {
+          addressPrefix: '10.1.0.10/32'
+          nextHopType: 'VirtualAppliance'
+          nextHopIpAddress: fw.properties.ipConfigurations[0].properties.privateIPAddress
+        }
+      }
+      {
         name: 'SpokeAppToFw'
         properties: {
           addressPrefix: '10.4.0.0/16'
@@ -1253,6 +1261,14 @@ resource routeTablesNameAppGw 'Microsoft.Network/routeTables@2019-07-01' = {
         name: 'JJBR1toFw'
         properties: {
           addressPrefix: '10.1.0.0/16'
+          nextHopType: 'VirtualAppliance'
+          nextHopIpAddress: fw.properties.ipConfigurations[0].properties.privateIPAddress
+        }
+      }
+      {
+        name: 'JJBR1toFw-router'
+        properties: {
+          addressPrefix: '10.1.0.10/32'
           nextHopType: 'VirtualAppliance'
           nextHopIpAddress: fw.properties.ipConfigurations[0].properties.privateIPAddress
         }
@@ -1353,6 +1369,22 @@ resource routeTablesNameSpokeApp 'Microsoft.Network/routeTables@2019-07-01' = {
         name: 'HubApiMngmtToFw'
         properties: {
           addressPrefix: '10.3.251.0/24'
+          nextHopType: 'VirtualAppliance'
+          nextHopIpAddress: fw.properties.ipConfigurations[0].properties.privateIPAddress
+        }
+      }
+      {
+        name: 'JJBR1toFw'
+        properties: {
+          addressPrefix: '10.1.0.0/16'
+          nextHopType: 'VirtualAppliance'
+          nextHopIpAddress: fw.properties.ipConfigurations[0].properties.privateIPAddress
+        }
+      }
+      {
+        name: 'JJBR1toFw-router'
+        properties: {
+          addressPrefix: '10.1.0.10/32'
           nextHopType: 'VirtualAppliance'
           nextHopIpAddress: fw.properties.ipConfigurations[0].properties.privateIPAddress
         }
