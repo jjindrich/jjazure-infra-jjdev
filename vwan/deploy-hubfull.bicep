@@ -49,7 +49,7 @@ resource vpnLinkBr1 'Microsoft.Network/vpnSites@2021-03-01' = {
     }
     addressSpace: {
       addressPrefixes: [
-        '169.254.10.2/32'
+        '10.1.0.10/32'
       ]
     }
     vpnSiteLinks: [
@@ -59,7 +59,7 @@ resource vpnLinkBr1 'Microsoft.Network/vpnSites@2021-03-01' = {
           ipAddress: '194.213.40.56'
           bgpProperties: {
             asn: 65100
-            bgpPeeringAddress: '169.254.10.2'
+            bgpPeeringAddress: '10.1.0.10'
           }          
           linkProperties:{
             linkProviderName: 'MS-office'
