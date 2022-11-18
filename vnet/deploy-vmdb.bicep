@@ -44,7 +44,7 @@ resource vmdb 'Microsoft.Compute/virtualMachines@2022-08-01' =  [for i in range(
   zones: [ '${i}' ]
   properties: {    
     hardwareProfile: {
-      vmSize: 'Standard_D2s_v5'
+      vmSize: 'Standard_D2ds_v5'
     }
     storageProfile: {
       osDisk: {
