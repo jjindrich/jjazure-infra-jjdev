@@ -1,5 +1,5 @@
 param fwName string = 'jjazfw'
-param fwTier string = 'Premium' // Standard or Premium
+param fwTier string = 'Standard' // Basic (remove Dns proxy section) or Standard or Premium
 param location string = 'westeurope'
 
 param virtualNetworkName string = 'jjazhubvnet'
@@ -13,6 +13,11 @@ resource fwSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existin
   parent: fwVnet
   name: 'AzureFirewallSubnet'
 }
+resource fwSubnetMngmt 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existing = {
+  parent: fwVnet
+  name: 'AzureFirewallManagementSubnet'
+}
+
 resource ipprefix 'Microsoft.Network/publicIPPrefixes@2021-02-01' existing = {
   name: publicIpPrefix
 }
@@ -48,10 +53,36 @@ resource fwPublicIp 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
     publicIPPrefix: {
       id: ipprefix.id
     }
+    
+  }
+}
+resource fwPublicIpMngmt 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
+  name: '${fwName}-mngmt-ip'
+  location: location
+  sku: {
+    name: 'Standard'
+    tier: 'Regional'
+  }
+  zones: [
+    '1'
+    '2'
+    '3'
+  ]
+  properties: {
+    publicIPAddressVersion: 'IPv4'
+    publicIPAllocationMethod: 'Static'
+    idleTimeoutInMinutes: 4
+    dnsSettings: {
+      domainNameLabel: '${fwName}-mngmt'
+    }
+    publicIPPrefix: {
+      id: ipprefix.id
+    }
+    
   }
 }
 
-resource fw 'Microsoft.Network/azureFirewalls@2021-02-01' = {
+resource fw 'Microsoft.Network/azureFirewalls@2022-05-01' = {
   name: fwName
   location: location
   zones: [
@@ -83,6 +114,17 @@ resource fw 'Microsoft.Network/azureFirewalls@2021-02-01' = {
         }
       }
     ]
+    managementIpConfiguration: {
+      name: 'mgmtIpConf'
+      properties: {
+        publicIPAddress: {
+          id: fwPublicIpMngmt.id
+        }
+        subnet: {
+          id: fwSubnetMngmt.id
+        }
+      }
+    }
     networkRuleCollections: []
     applicationRuleCollections: []
     natRuleCollections: []
@@ -99,6 +141,7 @@ resource fwPolicy 'Microsoft.Network/firewallPolicies@2021-02-01' = {
     sku: {
       tier: fwTier
     }
+    // remove Dns proxy section if fwTier is Basic
     dnsSettings: {
       enableProxy: true
       servers: []
@@ -660,8 +703,8 @@ resource fwPolicyRule2 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@
         rules: [
           {
             ruleType: 'NatRule'
-            name: 'HttpAppGw'
-            translatedAddress: '10.3.253.10'
+            name: 'HttpWebPublish'
+            translatedAddress: '10.3.250.10'
             translatedPort: '80'
             ipProtocols: [
               'TCP'

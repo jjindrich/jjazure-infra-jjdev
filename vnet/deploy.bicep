@@ -260,6 +260,32 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
+        name: 'appgw-snet'
+        properties: {
+          addressPrefix: '10.3.230.0/24'
+          networkSecurityGroup: {
+            id: nsgAppGwSubnet.id
+          }
+          serviceEndpoints: []
+          delegations: []
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+        }
+      }
+      {
+        name: 'apimngmt-snet'
+        properties: {
+          addressPrefix: '10.3.231.0/24'
+          networkSecurityGroup: {
+            id: nsgApiMngmtSubnet.id
+          }
+          serviceEndpoints: []
+          delegations: []
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+        }
+      }
+      {
         name: 'infra-snet'
         properties: {
           addressPrefix: '10.3.250.0/24'
@@ -269,19 +295,6 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
           serviceEndpoints: []
           delegations: []
           privateEndpointNetworkPolicies: 'Disabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-        }
-      }
-      {
-        name: 'apimngmt-snet'
-        properties: {
-          addressPrefix: '10.3.251.0/24'
-          networkSecurityGroup: {
-            id: nsgApiMngmtSubnet.id
-          }
-          serviceEndpoints: []
-          delegations: []
-          privateEndpointNetworkPolicies: 'Enabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
         }
       }
@@ -296,12 +309,9 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
       {
-        name: 'appgw-snet'
+        name: 'AzureFirewallManagementSubnet'
         properties: {
           addressPrefix: '10.3.253.0/24'
-          networkSecurityGroup: {
-            id: nsgAppGwSubnet.id
-          }
           serviceEndpoints: []
           delegations: []
           privateEndpointNetworkPolicies: 'Enabled'

@@ -20,3 +20,4 @@ az network vnet update -g $rg -n jjazappvnet --dns-servers ''
 az resource delete -g $rg -n jjazfw --resource-type "Microsoft.Network/azureFirewalls"
 az resource delete -g $rg -n jjazfw-policy --resource-type "Microsoft.Network/firewallPolicies"
 az resource delete -g $rg -n jjazfw-ip --resource-type "Microsoft.Network/publicIPAddresses"
+az resource delete -g $rg -n jjazfw-mngmt-ip --resource-type "Microsoft.Network/publicIPAddresses"
