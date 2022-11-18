@@ -5,8 +5,8 @@ param password string
 param username string = 'jj'
 
 param virtualNetworkResourceGroupName string = 'jjnetwork-rg'
-param virtualNetworkName string = 'jjazhubvnet'
-param virtualNetworkSubnetName string = 'infra-snet'
+param virtualNetworkName string = 'jjazappvnet'
+param virtualNetworkSubnetName string = 'app-snet'
 
 // reference existing network resources
 resource vnet 'Microsoft.Network/virtualNetworks@2021-02-01' existing = {
@@ -18,9 +18,11 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existing 
   name: virtualNetworkSubnetName
 }
 
-// create VM for AD
-resource vmadnic 'Microsoft.Network/networkInterfaces@2020-06-01' = {
-  name: '${vmNamePrefix}ad-nic'
+// create VMs for DB 
+var vmCountDb = 2
+var vmNamePrefixDb = '${vmNamePrefix}db'
+resource vmdbnic 'Microsoft.Network/networkInterfaces@2022-05-01' = [for i in range(1, vmCountDb): {
+  name: '${vmNamePrefixDb}${i}-nic'
   location: location
   properties: {
     ipConfigurations: [
@@ -30,27 +32,37 @@ resource vmadnic 'Microsoft.Network/networkInterfaces@2020-06-01' = {
           subnet: {
             id: subnet.id
           }
-          privateIPAllocationMethod: 'Static'
-          privateIPAddress: '10.3.250.10'
+          privateIPAllocationMethod: 'Dynamic'
         }
       }
     ]
   }
-}
-resource vmad 'Microsoft.Compute/virtualMachines@2021-04-01' = {
-  name: '${vmNamePrefix}ad'
+}]
+resource vmdb 'Microsoft.Compute/virtualMachines@2022-08-01' =  [for i in range(1, vmCountDb): {
+  name: '${vmNamePrefixDb}${i}'
   location: location
-  properties: {
+  zones: [ '${i}' ]
+  properties: {    
     hardwareProfile: {
-      vmSize: 'Standard_B1ms'
+      vmSize: 'Standard_D2s_v5'
     }
     storageProfile: {
       osDisk: {
         createOption: 'FromImage'
         managedDisk: {
-          storageAccountType: 'Standard_LRS'
+          storageAccountType: 'StandardSSD_LRS'
         }
       }
+      dataDisks: [        
+        {
+          createOption: 'Empty'
+          lun: 0          
+          diskSizeGB: 128
+          managedDisk:{
+            storageAccountType: 'PremiumV2_LRS'
+          }
+        }
+      ]
       imageReference: {
         publisher: 'MicrosoftWindowsServer'
         offer: 'WindowsServer'
@@ -61,30 +73,19 @@ resource vmad 'Microsoft.Compute/virtualMachines@2021-04-01' = {
     networkProfile: {
       networkInterfaces: [
         {
-          id: vmadnic.id
+          id: resourceId('Microsoft.Network/networkInterfaces', '${vmNamePrefixDb}${i}-nic')
         }
       ]
     }
     osProfile: {
-      computerName: '${vmNamePrefix}ad'
+      computerName: '${vmNamePrefixDb}${i}'
       adminUsername: username
       adminPassword: password
-    }
+    }    
     diagnosticsProfile: {
       bootDiagnostics: {
         enabled: true
       }
     }  
   }  
-}
-
-// resource vmadrun 'Microsoft.Compute/virtualMachines/runCommands@2022-03-01' = {
-//   parent: vmad
-//   name: 'runad'
-//   location: location
-//   properties:{
-//     source:{
-//       script: 'New-Item -itemType Directory -Path C:\\ -Name jj'
-//     }
-//   }
-// }
+}]
