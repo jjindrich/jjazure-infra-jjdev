@@ -19,7 +19,7 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existing 
 }
 
 // create VMs for DB 
-var vmCountDb = 2
+var vmCountDb = 1
 var vmNamePrefixDb = '${vmNamePrefix}db'
 resource vmdbnic 'Microsoft.Network/networkInterfaces@2022-05-01' = [for i in range(1, vmCountDb): {
   name: '${vmNamePrefixDb}${i}-nic'
@@ -87,5 +87,8 @@ resource vmdb 'Microsoft.Compute/virtualMachines@2022-08-01' =  [for i in range(
         enabled: true
       }
     }  
-  }  
+  }
+  dependsOn: [
+    vmdbnic
+  ]  
 }]
