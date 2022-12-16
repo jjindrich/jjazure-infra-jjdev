@@ -36,7 +36,7 @@ resource vpnGw 'Microsoft.Network/vpnGateways@2021-03-01' = {
   }
 }
 
-// // VPN link and connect into JJBR1
+// VPN to JJBR1// // VPN link and connect into JJBR1
 resource vpnLinkBr1 'Microsoft.Network/vpnSites@2021-03-01' = {
   name: '${vwanName}-${hubSuffix}-jjbr1'
   location: hubLocation
@@ -87,6 +87,63 @@ resource vpnLinkBr1Conn 'Microsoft.Network/vpnGateways/vpnConnections@2021-03-01
           enableBgp: true
           vpnSiteLink: {
             id: vpnLinkBr1.properties.vpnSiteLinks[0].id            
+          }
+        }
+      }
+    ]
+  }
+}
+// VPN to JJAZVnet
+resource vpnLinkJJAz 'Microsoft.Network/vpnSites@2021-03-01' = {
+  name: '${vwanName}-${hubSuffix}-jjaz'
+  location: hubLocation
+  properties: {
+    virtualWan: {
+      id: vwan.id
+    }
+    deviceProperties: {
+      deviceVendor: 'Azure VPN Gateway'
+    }
+    addressSpace: {
+      addressPrefixes: [
+        '10.3.0.30/32'
+      ]
+    }
+    vpnSiteLinks: [
+      {
+        name: 'JJAz'
+        properties:{
+          ipAddress: '20.238.219.208'
+          bgpProperties: {
+            asn: 64456
+            bgpPeeringAddress: '10.3.0.30'
+          }          
+          linkProperties:{
+            linkProviderName: 'JJAz'
+            linkSpeedInMbps: 10            
+          }
+        }
+      }
+    ]
+  }
+}
+resource vpnLinkJJAzConn 'Microsoft.Network/vpnGateways/vpnConnections@2021-03-01' = {
+  name: '${vwanName}-${hubSuffix}-vpnGw-jjaz'
+  parent: vpnGw
+  properties: {
+    remoteVpnSite: {
+      id: vpnLinkJJAz.id
+    }
+    vpnLinkConnections:[
+      {
+        name: '${vwanName}-${hubSuffix}-vpnGw-jjaz'
+        properties:{
+          sharedKey: 'abc123'
+          vpnConnectionProtocolType: 'IKEv2'
+          connectionBandwidth: 10
+          enableBgp: true
+          vpnSiteLink: {
+            id: vpnLinkJJAz.properties.vpnSiteLinks[0].id            
           }
         }
       }

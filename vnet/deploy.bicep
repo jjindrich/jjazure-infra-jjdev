@@ -550,6 +550,7 @@ resource vpnGw 'Microsoft.Network/virtualNetworkGateways@2021-05-01' = {
     }
     gatewayType: 'Vpn'
     vpnType: 'RouteBased'
+    vpnGatewayGeneration: 'Generation1'
     ipConfigurations:[
       {
         name: 'default'
@@ -566,11 +567,12 @@ resource vpnGw 'Microsoft.Network/virtualNetworkGateways@2021-05-01' = {
     ]
     enableBgp: true
     bgpSettings: {
-      asn: 65515
+      // changed from default 65515 (for connecting to Azure Virtual WAN)
+      asn: 64456
     }
   }
 }
-resource localVpnSite 'Microsoft.Network/localNetworkGateways@2021-05-01' = {
+resource localVpnSiteBr1 'Microsoft.Network/localNetworkGateways@2021-05-01' = {
   name: 'JJDevBR1'
   location: location
   properties:{
@@ -586,7 +588,7 @@ resource localVpnSite 'Microsoft.Network/localNetworkGateways@2021-05-01' = {
     }
   }
 }
-resource connVpn 'Microsoft.Network/connections@2021-05-01' = {
+resource connVpnBr1 'Microsoft.Network/connections@2021-05-01' = {
   name: 'JJDevBR1-to-${vpnGwName}'
   location: location
   properties: {
@@ -599,7 +601,41 @@ resource connVpn 'Microsoft.Network/connections@2021-05-01' = {
       properties: {}
     }
     localNetworkGateway2: {
-      id: localVpnSite.id
+      id: localVpnSiteBr1.id
+      properties: {}
+    }
+  }
+}
+resource localVpnSiteWan 'Microsoft.Network/localNetworkGateways@2021-05-01' = {
+  name: 'JJWAN'
+  location: location
+  properties:{
+    gatewayIpAddress: '20.31.217.72'
+    bgpSettings: {
+      asn: 65515
+      bgpPeeringAddress: '10.101.250.13'
+    }
+    localNetworkAddressSpace: {
+      addressPrefixes: [
+          '10.101.250.13/32'
+      ]
+    }
+  }
+}
+resource connVpnWan 'Microsoft.Network/connections@2021-05-01' = {
+  name: 'JJWAN-to-${vpnGwName}'
+  location: location
+  properties: {
+    connectionType: 'IPsec'
+    connectionProtocol: 'IKEv2'
+    sharedKey: 'abc123'
+    enableBgp: true
+    virtualNetworkGateway1: {
+      id: vpnGw.id
+      properties: {}
+    }
+    localNetworkGateway2: {
+      id: localVpnSiteWan.id
       properties: {}
     }
   }
@@ -627,7 +663,8 @@ resource nsgAppAks 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRange: '80'
-          sourceAddressPrefix: 'AzureFrontDoor.Backend'
+          //sourceAddressPrefix: 'AzureFrontDoor.Backend'
+          sourceAddressPrefix: '*'
           destinationAddressPrefix: '*'
           access: 'Allow'
           priority: 300

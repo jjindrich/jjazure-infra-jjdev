@@ -6,7 +6,7 @@ $HubAddressSpace = "10.3.0.0/16:100" # jjdevv2network address space
 $Tunnel1IP = "51.124.128.209" # jjdevv2vpngw-ip
 $PreSharedKey = "abc123"
 $BgpPeer = "10.3.0.30" # jjdevv2vpngw bgp ip
-$BgpAsn = "65515" # jjdevv2vpngw bgp asn
+$BgpAsn = "64456" # jjdevv2vpngw bgp asn
 
 # My local site configuration
 $RouterPublicIP = "194.213.40.56"
