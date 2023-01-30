@@ -124,7 +124,7 @@ resource wafSecurityPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPol
     customRules: {
       rules: [
         {
-          name: 'Geocheck'
+          name: 'Geocheck-deny'
           priority: 100
           ruleType: 'MatchRule'
           matchConditions: [
