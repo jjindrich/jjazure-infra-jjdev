@@ -27,7 +27,7 @@ data:
           # exclude_namespaces setting holds good only if enabled is set to true
           # kube-system,gatekeeper-system log collection are disabled by default in the absence of 'log_collection_settings.stderr' setting. If you want to enable kube-system,gatekeeper-system, remove them from the following setting.
           # If you want to continue to disable kube-system,gatekeeper-system log collection keep the namespaces in the following setting and add any other namespace you want to disable log collection to the array.
-          # In the absense of this cofigmap, default value for exclude_namespaces = ["kube-system","gatekeeper-system"]
+          # In the absense of this configmap, default value for exclude_namespaces = ["kube-system","gatekeeper-system"]
           exclude_namespaces = ["kube-system","gatekeeper-system"]
 
        [log_collection_settings.env_var]
@@ -42,11 +42,15 @@ data:
           # When the setting is set to false, only the kube events with !normal event type will be collected
           enabled = false
           # When this is enabled (enabled = true), all kube events including normal events will be collected
-       [log_collection_settings.schema]
+       #[log_collection_settings.schema]
           # In the absence of this configmap, default value for containerlog_schema_version is "v1"
           # Supported values for this setting are "v1","v2"
           # See documentation at https://aka.ms/ContainerLogv2 for benefits of v2 schema over v1 schema before opting for "v2" schema
           containerlog_schema_version = "v2"
+       #[log_collection_settings.enable_multiline_logs]
+          # fluent-bit based multiline log collection for go (stacktrace), dotnet (stacktrace)
+          # if enabled will also stitch together container logs split by docker/cri due to size limits(16KB per log line)
+          # enabled = "false"
 
 
   prometheus-data-collection-settings: |-
@@ -148,10 +152,27 @@ data:
   agent-settings: |-
     # prometheus scrape fluent bit settings for high scale
     # buffer size should be greater than or equal to chunk size else we set it to chunk size.
+    # settings scoped to prometheus sidecar container. all values in mb
     [agent_settings.prometheus_fbit_settings]
       tcp_listener_chunk_size = 10
       tcp_listener_buffer_size = 10
       tcp_listener_mem_buf_limit = 200
+
+    # prometheus scrape fluent bit settings for high scale
+    # buffer size should be greater than or equal to chunk size else we set it to chunk size.
+    # settings scoped to daemonset container. all values in mb
+    # [agent_settings.node_prometheus_fbit_settings]
+      # tcp_listener_chunk_size = 1
+      # tcp_listener_buffer_size = 1
+      # tcp_listener_mem_buf_limit = 10
+
+    # prometheus scrape fluent bit settings for high scale
+    # buffer size should be greater than or equal to chunk size else we set it to chunk size.
+    # settings scoped to replicaset container. all values in mb
+    # [agent_settings.cluster_prometheus_fbit_settings]
+      # tcp_listener_chunk_size = 1
+      # tcp_listener_buffer_size = 1
+      # tcp_listener_mem_buf_limit = 10
 
     # The following settings are "undocumented", we don't recommend uncommenting them unless directed by Microsoft.
     # They increase the maximum stdout/stderr log collection rate but will also cause higher cpu/memory usage.
@@ -160,8 +181,14 @@ data:
     #   log_flush_interval_secs = "1"                 # default value is 15
     #   tail_mem_buf_limit_megabytes = "10"           # default value is 10
     #   tail_buf_chunksize_megabytes = "1"            # default value is 32kb (comment out this line for default)
-    #   tail_buf_maxsize_megabytes = "1"              # defautl value is 32kb (comment out this line for default)
+    #   tail_buf_maxsize_megabytes = "1"              # default value is 32kb (comment out this line for default)
     #   tail_ignore_older = "5m"                      # default value same as fluent-bit default i.e.0m
+
+    # On both AKS & Arc K8s enviornments, if Cluster has configured with Forward Proxy then Proxy settings automatically applied and used for the agent
+    # Certain configurations, proxy config should be ignored for example Cluster with AMPLS + Proxy
+    # in such scenarios, use the following config to ignore proxy settings
+    # [agent_settings.proxy_config]
+    #    ignore_proxy_settings = "true"  # if this is not applied, default value is false
 
 metadata:
   name: container-azm-ms-agentconfig
