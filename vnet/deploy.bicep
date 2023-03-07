@@ -236,6 +236,50 @@ resource nsgDefaultSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' =
   }
 }
 
+resource nsgAaddsSubnet 'Microsoft.Network/networkSecurityGroups@2019-11-01' = {
+  name: '${vnetHubName}-aadds-nsg'
+  location: location
+  properties: {
+    securityRules: [
+      {
+        name: 'AllowPSRemoting'
+        properties:{
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '5986'
+          sourceAddressPrefix: 'AzureActiveDirectoryDomainServices'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 301
+          direction: 'Inbound'
+          sourcePortRanges: []
+          destinationPortRanges: []
+          sourceAddressPrefixes: []
+          destinationAddressPrefixes: []
+        }        
+      }
+      {
+        name: 'AllowRD'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '3389'
+          sourceAddressPrefix: 'CorpNetSaw'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 201
+          direction: 'Inbound'
+          sourcePortRanges: []
+          destinationPortRanges: []
+          sourceAddressPrefixes: []
+          destinationAddressPrefixes: []
+        }
+      }
+    ]
+  }
+}
+
+
 resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: vnetHubName
   location: location
@@ -249,6 +293,19 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
       dnsServers: []
     }
     subnets: [
+      {
+        name: 'aadds-snet'
+        properties: {
+          addressPrefix: '10.3.1.0/24'
+          networkSecurityGroup: {
+            id: nsgAaddsSubnet.id
+          }
+          serviceEndpoints: []
+          delegations: []
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+        }
+      }
       {
         name: 'GatewaySubnet'
         properties: {
@@ -487,6 +544,22 @@ resource vnetDnsResolverForwarding3 'Microsoft.Network/dnsForwardingRulesets/for
     targetDnsServers: [
       {
         ipAddress: '10.1.0.10'
+      }
+    ]
+    forwardingRuleState: 'Enabled'
+  }
+}
+resource vnetDnsResolverForwardingAadds 'Microsoft.Network/dnsForwardingRulesets/forwardingRules@2022-07-01' = {
+  name: '${vnetHubName}-dnsfwd-jjazureorg-aadds'  
+  parent: vnetDnsFwdRuleSet
+  properties: {
+    domainName: 'jjazure.org.'
+    targetDnsServers: [
+      {
+        ipAddress: '10.3.1.4'
+      }
+      {
+        ipAddress: '10.3.1.5'
       }
     ]
     forwardingRuleState: 'Enabled'
@@ -894,6 +967,7 @@ resource bastion 'Microsoft.Network/bastionHosts@2021-05-01' = {
     name: 'Standard'
   }
   properties: {
+    enableTunneling: true
     ipConfigurations: [
       {
         name: 'IpConf'
