@@ -1,47 +1,37 @@
 @secure()
 param password string
+param location string = 'westcentralus'
 
-module vnet1Module 'deploy-vnet.bicep' = {
-  name: 'vnet1Module'
-  params: {
-    location: 'eastus'
-    password: password
-    vnetName: 'jjvnet1'
-    vnetAddressPrefix: '10.1'
-    vmjumpName: 'jjvmjump1'
-  }
-}
-
-module vnet2Module 'deploy-vnet.bicep' = {
-  name: 'vnet2Module'
-  params: {
-    location: 'eastus'
-    password: password
-    vnetName: 'jjvnet2'
-    vnetAddressPrefix: '10.2'
-    vmjumpName: 'jjvmjump2'
-  }
-}
-
-module vnet3Module 'deploy-vnet.bicep' = {
+module vnetHubModule 'deploy-vnet.bicep' = {
   name: 'vnet3Module'
   params: {
-    location: 'westeurope'
+    location: location
     password: password
-    vnetName: 'jjvnet3'
-    vnetAddressPrefix: '10.3'
-    vmjumpName: 'jjvmjump3'
+    vnetName: 'jjazvnethub'
+    vnetAddressPrefix: '10.100'
+    vmjumpName: 'jjazvmjumphub'
   }
 }
 
-module vnet4Module 'deploy-vnet.bicep' = {
-  name: 'vnet4Module'
+module vnetSpoke1Module 'deploy-vnet.bicep' = {
+  name: 'vnet1Module'
   params: {
-    location: 'westeurope'
+    location: location
     password: password
-    vnetName: 'jjvnet4'
-    vnetAddressPrefix: '10.4'
-    vmjumpName: 'jjvmjump4'
+    vnetName: 'jjazvnetspoke1'
+    vnetAddressPrefix: '10.1'
+    vmjumpName: 'jjazvmjump1'
+  }
+}
+
+module vnetSpoke2Module 'deploy-vnet.bicep' = {
+  name: 'vnet2Module'
+  params: {
+    location: location
+    password: password
+    vnetName: 'jjazvnetspoke2'
+    vnetAddressPrefix: '10.2'
+    vmjumpName: 'jjazvmjump2'
   }
 }
 
@@ -49,4 +39,59 @@ module vnet4Module 'deploy-vnet.bicep' = {
 // Virtual network manager
 // -------------------------
 
-// create manually in portal
+resource vnetManager 'Microsoft.Network/networkManagers@2022-11-01' = {
+  name: 'jjaznetworkmanager'
+  location: location
+  properties:{
+    networkManagerScopes: {
+      subscriptions: [
+        '/subscriptions/${subscription().subscriptionId}'
+      ]
+    }
+    networkManagerScopeAccesses: [
+      'Connectivity'
+      'Routing'
+      'SecurityAdmin'
+    ]
+  }
+}
+resource vnetManagerGroup1 'Microsoft.Network/networkManagers/networkGroups@2022-11-01' = {
+  parent: vnetManager
+  name: 'jjazvnetspoke-all'
+}
+resource vnetManagerGroup1Member1 'Microsoft.Network/networkManagers/networkGroups/staticMembers@2022-11-01' = {
+  parent: vnetManagerGroup1
+  name: 'jjazvnetspoke-all-member1'
+  properties: {
+      resourceId : vnetSpoke1Module.outputs.vnetId
+  }
+}
+resource vnetManagerGroup1Member2 'Microsoft.Network/networkManagers/networkGroups/staticMembers@2022-11-01' = {
+  parent: vnetManagerGroup1
+  name: 'jjazvnetspoke-all-member2'
+  properties: {
+      resourceId : vnetSpoke2Module.outputs.vnetId
+  }
+}
+// Hub&Spoke connectivity
+resource vnetManagerConnectivity 'Microsoft.Network/networkManagers/connectivityConfigurations@2022-11-01' = {
+  parent: vnetManager
+  name: 'jjazvnethubspoke'
+  properties: {
+    connectivityTopology: 'HubAndSpoke'
+    deleteExistingPeering: 'true'
+    hubs: [
+      {
+        resourceType: 'VirtualNetwork'
+        resourceId: vnetHubModule.outputs.vnetId
+      }
+    ]
+    appliesToGroups: [
+      {
+        networkGroupId: vnetManagerGroup1.id
+        useHubGateway: 'true'
+        groupConnectivity: 'None'
+      }
+    ]
+  }
+}

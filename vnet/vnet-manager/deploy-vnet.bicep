@@ -2,6 +2,7 @@ param location string
 param vnetName string
 param vnetAddressPrefix string = '10.1'
 param vmjumpName string
+param username string = 'jj'
 @secure()
 param password string
 
@@ -89,7 +90,7 @@ resource vmjump 'Microsoft.Compute/virtualMachines@2021-04-01' = {
     }
     osProfile: {
       computerName: vmjumpName
-      adminUsername: 'jj'
+      adminUsername: username
       adminPassword: password
     }
     diagnosticsProfile: {
@@ -99,3 +100,5 @@ resource vmjump 'Microsoft.Compute/virtualMachines@2021-04-01' = {
     }
   }
 }
+
+output vnetId string = vnet.id
