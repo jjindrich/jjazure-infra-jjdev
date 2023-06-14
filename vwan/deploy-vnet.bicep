@@ -35,6 +35,9 @@ resource connectionApp 'Microsoft.Network/virtualHubs/hubVirtualNetworkConnectio
     remoteVirtualNetwork: {
       id: vnetApp.id
     }
+    allowHubToRemoteVnetTransit: true
+    allowRemoteVnetToUseHubVnetGateways: true
+    enableInternetSecurity: true
   }
 }
 

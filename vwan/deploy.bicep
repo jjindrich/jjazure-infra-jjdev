@@ -1,10 +1,12 @@
 param location string = resourceGroup().location
 
-param vwanName string = 'jjvwan'
+param vwanName string = 'jjazvwan'
 param region1Location string = 'West Europe'
 param region1Suffix string = 'weu'
 param region2Location string = 'North Europe'
 param region2Suffix string = 'neu'
+param region3Location string = 'Sweden Central'
+param region3Suffix string = 'swe'
 
 @secure()
 param password string
@@ -86,7 +88,7 @@ module hub2 'deploy-hub.bicep' = {
     hubLocation: region2Location
     hubSuffix: region2Suffix
     addressPrefixHub: '10.102.250.0/24'
-    secureHub: false
+    secureHub: true
   }
 }
 
@@ -111,5 +113,44 @@ module hub2App1Vm1 'deploy-vm.bicep' = {
     adminUsername: 'jj'
     adminPassword: password
     location: region2Location
+  }
+}
+
+// ----------------------------------------------------------
+// ------------------------ Region 3 ------------------------
+// ----------------------------------------------------------
+//  Hub Region3
+module hub3 'deploy-hub.bicep' = {
+  name: 'Hub3'
+  params: {
+    vwanName: vwanName
+    hubLocation: region3Location
+    hubSuffix: region3Suffix
+    addressPrefixHub: '10.103.250.0/24'
+    secureHub: false
+  }
+}
+
+// Vnets conneted to Hub1: app1
+module hub3Vnet1 'deploy-vnet.bicep' = {
+  name: 'Hub3Vnet1'
+  params: {
+    hubName: hub3.outputs.hubName
+    vnetName: 'app1'
+    addressPrefixVnet: '10.103.1.0/24'
+    location: region3Location
+  }
+}
+
+//VMs
+module hub3App1Vm1 'deploy-vm.bicep' = {
+  name: 'hub3App1Vm1'
+  params: {
+    vnetName: hub3Vnet1.outputs.vnetName
+    subnetName: hub3Vnet1.outputs.subnetName
+    vmName: '${hub3Vnet1.outputs.vnetName}-vm1'
+    adminUsername: 'jj'
+    adminPassword: password
+    location: region3Location
   }
 }

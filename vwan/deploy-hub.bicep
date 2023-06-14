@@ -54,3 +54,63 @@ resource fwPolicy 'Microsoft.Network/firewallPolicies@2020-11-01' = if (secureHu
     threatIntelMode: 'Alert'
   }  
 }
+
+resource fwPolicyNetwork 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2022-11-01' = if (secureHub) {
+  name: 'DefaultNetworkRuleCollectionGroup'
+  parent: fwPolicy
+  properties: {
+    priority: 100
+    ruleCollections: [
+      {
+        ruleCollectionType: 'FirewallPolicyFilterRuleCollection'
+        action: {
+          type: 'Allow'
+        }
+        priority: 100
+        name: 'Rule1'
+        rules: [
+        {
+          ruleType: 'NetworkRule'
+          name: 'JJ-icmp'
+          ipProtocols: [
+            'ICMP'
+          ]
+          sourceAddresses: [
+            '*'
+          ]
+          destinationAddresses: [
+            '*'
+          ]
+          destinationPorts: [
+            '*'
+          ]
+        }
+        ]
+      }
+    ]
+  }
+}
+
+// Routing policy
+resource routing 'Microsoft.Network/virtualHubs/routingIntent@2022-11-01' = if (secureHub) {
+  name: '${vwanName}-${hubSuffix}-routing'
+  parent: hub
+  properties: {
+    routingPolicies: [
+      {
+        destinations: [
+          'Internet'
+        ]
+        name: 'default-internet'
+        nextHop: azfw.id
+      }
+      {
+        destinations: [
+          'PrivateTraffic'
+        ]
+        name: 'default-private'
+        nextHop: azfw.id
+      }
+    ]
+  }
+}
