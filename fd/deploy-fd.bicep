@@ -147,7 +147,7 @@ resource wafSecurityPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPol
       managedRuleSets: [
         {
           ruleSetType: 'Microsoft_DefaultRuleSet'
-          ruleSetVersion: '2.0'
+          ruleSetVersion: '2.1'
           ruleSetAction: 'Block'
         }
         {
