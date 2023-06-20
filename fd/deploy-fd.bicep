@@ -124,13 +124,14 @@ resource wafSecurityPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPol
     customRules: {
       rules: [
         {
-          name: 'Geocheck-deny'
+          name: 'geocheck'
           priority: 100
           ruleType: 'MatchRule'
           matchConditions: [
             {
               matchVariable: 'SocketAddr'
               operator: 'GeoMatch'
+              negateCondition: true
               matchValue: [
                 'CZ'
                 'GB'
