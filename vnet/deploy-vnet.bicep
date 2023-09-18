@@ -904,6 +904,26 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
           privateLinkServiceNetworkPolicies: 'Enabled'
         }
       }
+      {
+        name: 'appgw-snet'
+        properties: {
+          addressPrefix: '10.4.8.0/24'
+          networkSecurityGroup: {
+            id: nsgAppDefault.id
+          }
+          serviceEndpoints: []
+          delegations: [
+            {
+              name: 'delegation'
+              properties: {
+                serviceName: 'Microsoft.ServiceNetworking/trafficControllers'
+              }
+            }
+          ]
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+        }
+      }
     ]
     enableDdosProtection: false
     enableVmProtection: false
