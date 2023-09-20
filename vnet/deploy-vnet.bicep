@@ -899,7 +899,14 @@ resource vnetApp 'Microsoft.Network/virtualNetworks@2019-11-01' = {
             id: nsgAppDefault.id
           }
           serviceEndpoints: []
-          delegations: []
+          delegations: [
+            {
+              name: 'delegation'
+              properties: {
+                serviceName: 'Microsoft.App/environments'
+              }
+            }
+          ]
           privateEndpointNetworkPolicies: 'Enabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
         }
