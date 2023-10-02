@@ -1,6 +1,7 @@
 param location string = 'Global'
 param fdName string = 'jjazfd'
-param privateLinkLbId string = '/subscriptions/eb1d6021-9f80-4613-b383-2bd8c4d31f09/resourceGroups/mc_jjmicroservices-rg_jjazaks_westeurope/providers/Microsoft.Network/privateLinkServices/pls-ac8a852e666174ad5a99ab3134022c9c'
+param privateLinkLbId string
+param privateIp string
 // docs: https://github.com/Azure/azure-quickstart-templates/blob/master/quickstarts/microsoft.cdn/front-door-premium-waf-managed/main.bicep
 
 resource fd 'Microsoft.Cdn/profiles@2022-11-01-preview' = {
@@ -45,10 +46,10 @@ resource fdOriginDefault 'Microsoft.Cdn/profiles/originGroups/origins@2022-11-01
   parent: fdOriginGroupDefault
   name: 'default-origin'
   properties: {
-    hostName: '10.4.2.250'
+    hostName: privateIp
     httpPort: 80
     httpsPort: 443
-    originHostHeader: '10.4.2.250'
+    originHostHeader: privateIp
     priority: 1
     weight: 1000
     enabledState: 'Enabled'
