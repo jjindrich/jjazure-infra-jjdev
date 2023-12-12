@@ -19,7 +19,10 @@
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"ms-azuretools.vscode-azurefunctions",
-		"ms-vscode.powershell"
+		"ms-vscode.powershell",
+		"ms-azuretools.vscode-bicep",
+		"GitHub.copilot",
+		"GitHub.copilot-chat"
 	],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
