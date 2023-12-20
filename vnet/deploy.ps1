@@ -1,4 +1,6 @@
-az deployment sub create -l westeurope --template-file deploy.bicep
+az deployment sub create -l westeurope --template-file deploy-region-we.bicep
+
+az deployment sub create -l swedencentral --template-file deploy-region-sc.bicep
 
 # $rg = "jjnetwork-rg"
 # az group create -n $rg -l westeurope

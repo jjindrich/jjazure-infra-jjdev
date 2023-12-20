@@ -646,7 +646,7 @@ resource vpnGw 'Microsoft.Network/virtualNetworkGateways@2021-05-01' = {
   }
 }
 resource localVpnSiteBr1 'Microsoft.Network/localNetworkGateways@2021-05-01' = {
-  name: 'JJDevBR1'
+  name: '${vpnGwName}-JJDevBR1'
   location: location
   properties:{
     gatewayIpAddress: '194.213.40.56'
@@ -680,7 +680,7 @@ resource connVpnBr1 'Microsoft.Network/connections@2021-05-01' = {
   }
 }
 resource localVpnSiteWan 'Microsoft.Network/localNetworkGateways@2021-05-01' = {
-  name: 'JJWAN'
+  name: '${vpnGwName}-JJWAN'
   location: location
   properties:{
     gatewayIpAddress: '20.31.217.72'
