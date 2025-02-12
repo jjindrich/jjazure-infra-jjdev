@@ -1,0 +1,38 @@
+---------------------------------------------------------------------
+Configure IPSec VPN connection from StrongsWan to Azure VPN gateway
+config:
+   - Azure VPN GW 4.223.80.54 in vnet 192.168.10.0/24
+   - VM Ubuntu 192.168.20.4 in vnet 192.168.20.0/24
+---------------------------------------------------------------------
+
+Ubuntu VM
+---------
+
+sudo apt install strongswan
+
+File: sudo nano /etc/ipsec.conf
+conn jjhomegw
+    leftsubnet=192.168.20.0/24
+    left=192.168.20.4
+    rightsubnet=192.168.10.0/24
+    right=4.223.80.54
+    authby=psk
+    auto=start
+    keyexchange=ikev2
+    ike=aes256-sha1-modp1024
+    esp=aes128-sha1
+    type=tunnel
+    ikelifetime=480m
+    dpddelay=300s
+    dpdtimeout=45s
+    dpdaction=restart
+    rekey=no
+    keylife=3600s
+    closeaction=restart
+
+
+File: sudo nano /etc/ipsec.secrets
+192.168.20.4 4.223.80.54 : PSK abc123
+
+sudo systemctl restart ipsec
+sudo cat /var/log/syslog
