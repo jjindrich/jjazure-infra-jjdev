@@ -8,7 +8,7 @@ resource symbolicname 'Microsoft.AVS/privateClouds@2023-09-01' = {
     internet: 'Enabled'
     networkBlock: '10.41.0.0/22'
     managementCluster:{
-      clusterSize: 1
+      clusterSize: 3
     }
   }
   sku: {
